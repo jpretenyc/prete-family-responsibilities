@@ -1,0 +1,1436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Prete Family Responsibilities</title>
+
+<!-- Fonts load from Google Fonts but the site falls back to system fonts offline. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter+Tight:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+/* ==========================================================================
+   DESIGN TOKENS
+   ========================================================================== */
+:root{
+  --paper:#F7F6F3;
+  --ink:#16181D;
+  --muted:#6C707A;
+  --rule:#D9D7D1;
+  --hyrum:#33556E;
+  --rosemary:#74374F;
+  --felicity:#A4712A;
+
+  --font-display:"Fraunces", Georgia, "Times New Roman", serif;
+  --font-body:"Inter Tight", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-mono:"IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+
+  --accent:var(--ink);        /* overridden per-kid via body[data-kid] */
+  --maxw:640px;
+}
+
+/* Per-child accent, applied only while that child's screen is open */
+body[data-kid="hyrum"]{ --accent:var(--hyrum); }
+body[data-kid="rosemary"]{ --accent:var(--rosemary); }
+body[data-kid="felicity"]{ --accent:var(--felicity); }
+
+*{ box-sizing:border-box; }
+html,body{ margin:0; padding:0; }
+body{
+  background:var(--paper);
+  color:var(--ink);
+  font-family:var(--font-body);
+  font-size:17px;
+  line-height:1.5;
+  -webkit-text-size-adjust:100%;
+  -webkit-font-smoothing:antialiased;
+}
+.num{ font-family:var(--font-mono); font-variant-numeric:tabular-nums; }
+
+/* ==========================================================================
+   LAYOUT
+   ========================================================================== */
+#app{ max-width:var(--maxw); margin:0 auto; padding:22px 18px 64px; }
+.view{ opacity:1; }
+.fade-out{ opacity:0; }
+@media (prefers-reduced-motion:no-preference){
+  .view{ transition:opacity .18s ease; }
+}
+
+/* Skip link */
+.skip{
+  position:absolute; left:-9999px; top:8px;
+  background:var(--ink); color:var(--paper);
+  padding:10px 14px; border-radius:8px; z-index:100; text-decoration:none;
+}
+.skip:focus{ left:12px; }
+
+/* Focus rings — visible everywhere */
+a:focus-visible, button:focus-visible, input:focus-visible,
+[tabindex]:focus-visible, .card:focus-visible, .link-row a:focus-visible{
+  outline:2px solid var(--accent);
+  outline-offset:2px;
+  border-radius:4px;
+}
+
+/* ==========================================================================
+   TYPOGRAPHY HELPERS
+   ========================================================================== */
+h1,h2,h3{ font-family:var(--font-display); font-weight:500; line-height:1.12; margin:0; }
+.eyebrow{
+  font-family:var(--font-mono); font-size:.72rem; letter-spacing:.14em;
+  text-transform:uppercase; color:var(--muted); margin:0 0 6px;
+}
+.rule{ border:0; border-top:1px solid var(--rule); margin:20px 0; }
+.rule-accent{ border:0; border-top:2px solid var(--accent); margin:0 0 18px; width:44px; }
+.muted{ color:var(--muted); }
+
+/* ==========================================================================
+   TOP BRAND / BACK NAV
+   ========================================================================== */
+.brand{ display:flex; align-items:baseline; justify-content:space-between; gap:12px; margin-bottom:18px; }
+.brand h1{ font-size:1.32rem; letter-spacing:.005em; }
+.brand .ver{ font-family:var(--font-mono); font-size:.72rem; color:var(--muted); white-space:nowrap; }
+.back{
+  display:inline-flex; align-items:center; gap:8px;
+  min-height:44px; text-decoration:none; color:var(--muted);
+  font-family:var(--font-mono); font-size:.8rem; letter-spacing:.04em;
+}
+.back:hover{ color:var(--ink); }
+.back svg{ width:16px; height:16px; }
+
+/* ==========================================================================
+   HOME — THIS WEEK header + countdown
+   ========================================================================== */
+.thisweek{ margin-bottom:6px; }
+.thisweek h2{ font-size:2.05rem; letter-spacing:-.01em; }
+.weekmeta{ display:flex; flex-wrap:wrap; gap:6px 16px; margin-top:8px; color:var(--muted); }
+.weekmeta .num{ color:var(--ink); }
+
+.countdown{
+  margin:16px 0 6px; padding:16px 0; border-top:1px solid var(--rule); border-bottom:1px solid var(--rule);
+}
+.countdown.downtime{ border-top-width:2px; border-top-color:var(--ink); }
+.countdown .state{ font-family:var(--font-mono); font-size:.74rem; letter-spacing:.14em; text-transform:uppercase; color:var(--muted); }
+.countdown.downtime .state{ color:var(--ink); font-weight:600; }
+.countdown .headline{ font-family:var(--font-display); font-size:1.15rem; margin:6px 0 4px; }
+.countdown .clock{ font-family:var(--font-mono); font-size:1.7rem; letter-spacing:.02em; }
+.countdown .sub{ color:var(--muted); font-size:.9rem; margin-top:2px; }
+
+/* ==========================================================================
+   ROTATION DIAL (signature element)
+   ========================================================================== */
+.dial{
+  margin:22px 0; border:1px solid var(--rule); border-radius:10px; overflow:hidden;
+  display:grid; grid-template-columns:repeat(3,1fr);
+}
+.dial-col{ padding:14px 12px; border-right:1px solid var(--rule); min-width:0; }
+.dial-col:last-child{ border-right:0; }
+.dial-col.current{ background:transparent; }
+.dial-col.current .dial-week{ color:var(--ink); }
+.dial-col.current .dial-name{ color:var(--ink); font-weight:600; }
+.dial-col:not(.current) .dial-week,
+.dial-col:not(.current) .dial-name,
+.dial-col:not(.current) .dial-track{ color:var(--muted); font-weight:400; }
+.dial-week{ font-family:var(--font-mono); font-size:.72rem; letter-spacing:.12em; text-transform:uppercase; margin-bottom:2px; }
+.dial-col.current .dial-week::after{ content:" ·  now"; letter-spacing:.08em; }
+.dial-row{ display:flex; gap:8px; align-items:baseline; padding:5px 0; border-top:1px solid var(--rule); }
+.dial-row:first-of-type{ border-top:0; }
+.dial-track{ font-family:var(--font-mono); font-size:.78rem; width:14px; color:var(--muted); }
+.dial-name{ font-family:var(--font-display); font-size:1rem; line-height:1.1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+/* Keep all three rotation columns legible on a narrow phone (375px). */
+@media (max-width:430px){
+  .dial-col{ padding:12px 7px; }
+  .dial-week{ font-size:.62rem; letter-spacing:.06em; }
+  .dial-col.current .dial-week::after{ content:" · now"; }
+  .dial-track{ font-size:.68rem; width:11px; }
+  .dial-name{ font-size:.86rem; }
+}
+
+/* ==========================================================================
+   KID CARDS (home)
+   ========================================================================== */
+.cards{ display:grid; gap:12px; }
+.card{
+  display:block; text-decoration:none; color:inherit;
+  border:1px solid var(--rule); border-radius:12px; padding:16px 16px 14px;
+  background:#fff;
+}
+.card:hover{ border-color:var(--ink); }
+.card-top{ display:flex; align-items:center; gap:12px; }
+.card-letter{
+  font-family:var(--font-display); font-weight:600; font-size:1.5rem; line-height:1;
+  width:40px; height:40px; min-width:40px; border-radius:8px;
+  display:flex; align-items:center; justify-content:center;
+  border:2px solid var(--kidaccent, var(--ink)); color:var(--kidaccent, var(--ink));
+}
+.card-name{ font-family:var(--font-display); font-size:1.34rem; font-weight:500; }
+.card-summary{ color:var(--muted); margin-top:2px; font-size:.95rem; }
+.card-meta{ display:flex; flex-wrap:wrap; gap:4px 18px; margin-top:12px; padding-top:12px; border-top:1px solid var(--rule); font-size:.86rem; color:var(--muted); }
+.card-meta b{ color:var(--ink); font-weight:500; }
+.card-done{ font-family:var(--font-mono); font-size:.74rem; letter-spacing:.1em; text-transform:uppercase; color:var(--ink); }
+.card-with{ display:block; margin-top:2px; font-size:.82rem; color:var(--muted); font-style:italic; }
+
+/* Quiet link row (Money / Principles / Fine print) */
+.link-row{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-top:22px; }
+.link-row a{
+  text-decoration:none; color:var(--ink); border:1px solid var(--rule); border-radius:10px;
+  padding:14px 10px; text-align:center; min-height:44px;
+  font-family:var(--font-mono); font-size:.78rem; letter-spacing:.06em; text-transform:uppercase;
+}
+.link-row a:hover{ border-color:var(--ink); }
+
+/* ==========================================================================
+   KID VIEW
+   ========================================================================== */
+.kid-head{ display:flex; align-items:flex-start; gap:14px; margin-bottom:6px; }
+.kid-letter{
+  font-family:var(--font-display); font-weight:600; font-size:2.4rem; line-height:1;
+  width:58px; height:58px; min-width:58px; border-radius:10px;
+  display:flex; align-items:center; justify-content:center;
+  border:2px solid var(--accent); color:var(--accent);
+}
+.kid-name{ font-family:var(--font-display); font-size:2rem; font-weight:500; line-height:1.05; }
+.kid-sub{ color:var(--muted); font-size:.92rem; margin-top:3px; }
+.kid-sub .num{ color:var(--ink); }
+
+.tracker-note{
+  font-size:.82rem; color:var(--muted); background:transparent;
+  border:1px dashed var(--rule); border-radius:8px; padding:8px 10px; margin:14px 0 6px;
+}
+
+/* Hero — illustrative yearly potential */
+.hero{ margin:18px 0; padding:16px 0; border-top:1px solid var(--rule); border-bottom:1px solid var(--rule); }
+.hero .eyebrow{ margin-bottom:2px; }
+.hero .big{ font-family:var(--font-mono); font-weight:600; font-size:2.7rem; line-height:1; color:var(--accent); letter-spacing:-.01em; }
+.hero .cap{ color:var(--muted); font-size:.82rem; margin-top:4px; }
+
+/* Checklists */
+.section-title{ font-family:var(--font-display); font-size:1.28rem; margin:26px 0 4px; }
+.group-title{ font-family:var(--font-mono); font-size:.76rem; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); margin:18px 0 6px; }
+.group-title .hint{ text-transform:none; letter-spacing:0; font-family:var(--font-body); font-style:italic; }
+
+ul.list{ list-style:none; margin:0; padding:0; }
+li.item{ display:flex; align-items:flex-start; gap:10px; padding:4px 0; border-top:1px solid var(--rule); }
+li.item:first-child{ border-top:0; }
+
+.check{ display:flex; align-items:flex-start; gap:12px; flex:1; cursor:pointer; min-height:44px; padding:6px 0; }
+.check input{ position:absolute; opacity:0; width:1px; height:1px; }
+.box{
+  width:26px; height:26px; min-width:26px; margin-top:1px; border:2px solid var(--muted); border-radius:6px;
+  display:flex; align-items:center; justify-content:center; color:#fff; background:#fff;
+}
+.box svg{ width:18px; height:18px; opacity:0; }
+.check input:checked + .box{ background:var(--accent); border-color:var(--accent); }
+.check input:checked + .box svg{ opacity:1; }
+@media (prefers-reduced-motion:no-preference){
+  .box svg{ transition:opacity .12s ease; }
+}
+.check input:focus-visible + .box{ outline:2px solid var(--accent); outline-offset:2px; }
+.chooseone .box{ border-radius:50%; }
+.txt{ flex:1; padding-top:2px; }
+.check input:checked ~ .txt{ color:var(--muted); }
+.fel-icon{ width:17px; height:17px; margin-right:2px; vertical-align:-2px; color:var(--accent); }
+
+/* Felicity reads one step larger */
+body[data-kid="felicity"] .txt{ font-size:1.09rem; }
+
+/* Camera control + thumbnail */
+.cam{
+  appearance:none; background:#fff; border:1px solid var(--rule); border-radius:8px;
+  width:44px; height:44px; min-width:44px; margin-top:4px;
+  display:flex; align-items:center; justify-content:center; color:var(--muted); cursor:pointer;
+}
+.cam:hover{ color:var(--ink); border-color:var(--ink); }
+.cam svg{ width:20px; height:20px; }
+.cam.has{ color:var(--accent); border-color:var(--accent); }
+.thumb{ width:44px; height:44px; min-width:44px; margin-top:4px; border-radius:8px; overflow:hidden; border:1px solid var(--rule); padding:0; cursor:pointer; background:#fff; }
+.thumb img{ width:100%; height:100%; object-fit:cover; display:block; }
+
+/* ---- Splashy home hero banner (color + NYC skyline at dawn) ------------ */
+.hero-banner{ position:relative; border-radius:18px; overflow:hidden; margin-bottom:24px; min-height:252px; display:flex;
+  box-shadow:0 12px 32px -18px rgba(16,18,24,.55); }
+.hero-art{ position:absolute; inset:0; width:100%; height:100%; display:block; }
+.hero-copy{ position:relative; align-self:flex-end; width:100%;
+  padding:66px 20px 20px;
+  background:linear-gradient(to top, rgba(11,13,21,.95) 16%, rgba(11,13,21,.5) 56%, rgba(11,13,21,0));
+  color:#F7F6F3; }
+.hero-top{ display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:12px; }
+.hero-kicker{ font-family:var(--font-mono); font-size:.66rem; letter-spacing:.18em; text-transform:uppercase; color:#EFD39A; }
+.hero-chip{ font-family:var(--font-mono); font-size:.64rem; letter-spacing:.09em; text-transform:uppercase; color:#F6E8C7;
+  border:1px solid rgba(246,232,199,.45); border-radius:999px; padding:5px 11px; white-space:nowrap; }
+.hero-title{ font-family:var(--font-display); font-weight:600; font-size:2.4rem; line-height:1.0; margin:0; color:#fff; letter-spacing:-.015em; }
+.hero-dots{ display:flex; gap:7px; margin:13px 0 0; }
+.hero-dots span{ width:9px; height:9px; border-radius:50%; display:block; box-shadow:0 0 0 1px rgba(255,255,255,.18); }
+.hero-quote{ font-family:var(--font-display); font-style:italic; font-size:1.04rem; line-height:1.34; margin:12px 0 0; max-width:44ch; color:#F3ECDD; }
+.hero-quote cite{ font-style:normal; font-family:var(--font-mono); font-size:.68rem; letter-spacing:.03em; color:#DCC9A2; }
+@media (max-width:430px){
+  .hero-banner{ min-height:232px; }
+  .hero-title{ font-size:1.92rem; }
+  .hero-kicker{ font-size:.6rem; letter-spacing:.12em; }
+  .hero-chip{ font-size:.58rem; padding:4px 9px; }
+  .hero-quote{ font-size:.93rem; }
+  .hero-copy{ padding:58px 16px 17px; }
+}
+
+/* ---- Home "this week" panel (the lively status card) ------------------- */
+.week-panel{ position:relative; background:#fff; border:1px solid var(--rule); border-radius:16px;
+  padding:20px 18px 16px; margin-bottom:22px; overflow:hidden; }
+.week-panel::before{ content:""; position:absolute; top:0; left:0; right:0; height:4px;
+  background:linear-gradient(90deg, var(--hyrum) 0 33.33%, var(--rosemary) 33.33% 66.66%, var(--felicity) 66.66% 100%); }
+.wp-head{ display:flex; justify-content:space-between; align-items:baseline; gap:10px; }
+.wp-head .eyebrow{ margin:0; }
+.wp-end{ font-family:var(--font-mono); font-size:.74rem; color:var(--muted); white-space:nowrap; }
+.wp-title{ font-family:var(--font-display); font-weight:500; font-size:1.7rem; line-height:1.05; margin:6px 0 15px; }
+.wp-status{ display:flex; align-items:center; gap:14px; padding:14px 15px; border-radius:12px; background:var(--paper); border:1px solid var(--rule); }
+.wp-status.downtime{ background:#23262E; border-color:#23262E; color:#F7F6F3; }
+.wp-status.closed{ background:var(--paper); }
+.wp-state{ font-family:var(--font-mono); font-size:.66rem; letter-spacing:.12em; text-transform:uppercase;
+  padding:7px 11px; border-radius:999px; background:var(--ink); color:#fff; white-space:nowrap; }
+.wp-status.downtime .wp-state{ background:#E0B24E; color:#23262E; }
+.wp-clockwrap{ line-height:1.12; }
+.wp-clock{ font-family:var(--font-mono); font-size:1.5rem; font-weight:500; letter-spacing:.01em; }
+.wp-target{ font-family:var(--font-mono); font-size:.72rem; color:var(--muted); margin-top:1px; }
+.wp-status.downtime .wp-target{ color:#C6C8CF; }
+.wp-sub{ color:var(--muted); font-size:.9rem; margin:13px 2px 2px; }
+@media (max-width:430px){ .wp-clock{ font-size:1.28rem; } .wp-title{ font-size:1.5rem; } }
+
+/* Small section labels that give the home page rhythm */
+.home-label{ font-family:var(--font-mono); font-size:.72rem; letter-spacing:.12em; text-transform:uppercase;
+  color:var(--muted); margin:0 2px 10px; }
+.home-label.spaced{ margin-top:24px; }
+
+/* Large primary action at the bottom of a kid's list */
+.btn-xl{ font-size:1.12rem; padding:18px 20px; border-radius:13px; font-weight:500; letter-spacing:.01em; }
+.checkoff-wrap{ margin:30px 0 8px; }
+.checkoff-note{ text-align:center; color:var(--muted); font-size:.82rem; margin:10px 2px 0; }
+
+/* ---- Done / N/A mark control (both give full credit) ------------------- */
+li.item{ align-items:center; }
+.item .txt{ flex:1; }
+.mark{ display:flex; gap:6px; flex-shrink:0; }
+.mk{ min-height:44px; padding:6px 13px; border:1px solid var(--rule); background:#fff; border-radius:8px;
+  font-family:var(--font-mono); font-size:.7rem; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); cursor:pointer; }
+.mk:hover{ border-color:var(--ink); color:var(--ink); }
+.mk[aria-pressed="true"]{ color:#fff; }
+.mk-done[aria-pressed="true"]{ background:var(--accent); border-color:var(--accent); }
+.mk-na[aria-pressed="true"]{ background:var(--muted); border-color:var(--muted); }
+.item.marked .txt{ color:var(--muted); }
+
+/* ---- Choose-one options (single select; one counts as done) ------------ */
+.opt-item{ padding:0; }
+.opt{ display:flex; align-items:flex-start; gap:12px; width:100%; text-align:left; background:#fff;
+  border:0; border-top:1px solid var(--rule); padding:12px 2px; min-height:44px; cursor:pointer; font:inherit; color:inherit; }
+.opt-item:first-child .opt{ border-top:0; }
+.opt-dot{ width:22px; height:22px; min-width:22px; border:2px solid var(--muted); border-radius:50%; margin-top:2px; position:relative; }
+.opt[aria-pressed="true"] .opt-dot{ border-color:var(--accent); }
+.opt[aria-pressed="true"] .opt-dot::after{ content:""; position:absolute; inset:4px; border-radius:50%; background:var(--accent); }
+.opt:focus-visible{ outline:2px solid var(--accent); outline-offset:2px; border-radius:6px; }
+.opt-na .txt{ font-family:var(--font-mono); font-size:.82rem; letter-spacing:.04em; text-transform:uppercase; color:var(--muted); }
+
+/* ---- Single optional proof photo for the whole week -------------------- */
+.photo-block{ border:1px solid var(--rule); border-radius:12px; padding:14px; margin:16px 0; }
+.photo-block .eyebrow{ margin-bottom:10px; }
+.photo-row{ display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+.photo-thumb{ width:64px; height:64px; min-width:64px; border-radius:10px; overflow:hidden; border:1px solid var(--rule); padding:0; cursor:pointer; background:#fff; }
+.photo-thumb img{ width:100%; height:100%; object-fit:cover; display:block; }
+.photo-hint{ color:var(--muted); font-size:.82rem; margin-top:10px; }
+
+/* Progress + actions */
+.progress{ font-family:var(--font-mono); font-size:.9rem; margin:20px 0 4px; }
+.progress .done{ color:var(--accent); font-weight:600; }
+.progress-bar{ height:6px; background:var(--rule); border-radius:3px; overflow:hidden; margin-top:8px; }
+.progress-bar span{ display:block; height:100%; background:var(--accent); width:0; }
+@media (prefers-reduced-motion:no-preference){ .progress-bar span{ transition:width .2s ease; } }
+.all-done{ font-family:var(--font-mono); font-size:.8rem; letter-spacing:.06em; text-transform:uppercase; color:var(--accent); margin-top:8px; }
+
+.actions{ display:flex; flex-wrap:wrap; gap:10px; margin:22px 0 6px; }
+.btn{
+  appearance:none; font-family:var(--font-body); font-size:.95rem; cursor:pointer;
+  border:1px solid var(--ink); background:#fff; color:var(--ink);
+  border-radius:10px; padding:12px 16px; min-height:44px;
+}
+.btn:hover{ background:var(--ink); color:var(--paper); }
+.btn-primary{ background:var(--accent); border-color:var(--accent); color:#fff; }
+.btn-primary:hover{ filter:brightness(1.08); background:var(--accent); color:#fff; }
+.btn-quiet{ border-color:var(--rule); color:var(--muted); }
+.btn-quiet:hover{ background:transparent; color:var(--ink); border-color:var(--ink); }
+.btn-block{ width:100%; }
+
+.mini{ display:flex; flex-wrap:wrap; gap:16px; margin-top:12px; }
+.mini a, .mini button{
+  background:none; border:0; padding:8px 0; min-height:44px; cursor:pointer;
+  font-family:var(--font-mono); font-size:.78rem; letter-spacing:.04em; color:var(--muted); text-decoration:none;
+}
+.mini a:hover, .mini button:hover{ color:var(--ink); }
+
+.factrow{ display:grid; gap:10px; margin:18px 0; }
+.fact{ display:flex; justify-content:space-between; gap:12px; padding:10px 0; border-top:1px solid var(--rule); }
+.fact:first-child{ border-top:0; }
+.fact .k{ color:var(--muted); font-size:.9rem; }
+.fact .v{ text-align:right; }
+.fact .v .num{ color:var(--ink); }
+
+.optlist{ list-style:none; margin:10px 0 0; padding:0; }
+.optlist li{ padding:8px 0; border-top:1px solid var(--rule); font-size:.95rem; }
+.optlist li:first-child{ border-top:0; }
+
+/* ==========================================================================
+   MONEY
+   ========================================================================== */
+.table{ width:100%; border-collapse:collapse; margin:10px 0 4px; }
+.table th, .table td{ text-align:left; padding:10px 8px; border-top:1px solid var(--rule); }
+.table th{ font-family:var(--font-mono); font-size:.72rem; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); font-weight:500; }
+.table td.n, .table th.n{ text-align:right; font-family:var(--font-mono); }
+
+.waterfall{ display:flex; height:34px; border-radius:8px; overflow:hidden; border:1px solid var(--rule); margin:14px 0 8px; }
+.waterfall .seg{ display:flex; align-items:center; justify-content:center; font-family:var(--font-mono); font-size:.74rem; color:#fff; }
+.waterfall .s-tithe{ background:#3B3E45; }
+.waterfall .s-save{ background:#6C707A; }
+.waterfall .s-spend{ background:#A9ADB4; color:var(--ink); }
+.waterlegend{ display:grid; gap:8px; margin-top:10px; }
+.waterlegend div{ font-size:.92rem; }
+.waterlegend .pct{ font-family:var(--font-mono); font-weight:600; margin-right:6px; }
+
+.potential{ display:grid; gap:12px; margin:16px 0; }
+.pcard{ border:1px solid var(--rule); border-radius:12px; padding:16px; }
+.pcard .who{ font-family:var(--font-display); font-size:1.2rem; }
+.pcard .ptotal{ font-family:var(--font-mono); font-weight:600; font-size:2.3rem; line-height:1; margin:6px 0 2px; }
+.pcard[data-k="hyrum"] .ptotal{ color:var(--hyrum); }
+.pcard[data-k="rosemary"] .ptotal{ color:var(--rosemary); }
+.pcard[data-k="felicity"] .ptotal{ color:var(--felicity); }
+.pcard .pbreak{ color:var(--muted); font-size:.82rem; margin-top:6px; font-family:var(--font-mono); }
+.pcard .pstep{ font-size:.86rem; margin-top:8px; }
+
+/* ==========================================================================
+   PRINCIPLES (editorial)
+   ========================================================================== */
+.epigraphs{ margin:8px 0 6px; }
+.epigraph{ margin:0 0 22px; }
+.epigraph p{ font-family:var(--font-display); font-size:1.32rem; line-height:1.28; margin:0; font-weight:400; }
+.epigraph cite{ display:block; font-family:var(--font-mono); font-size:.78rem; color:var(--muted); font-style:normal; margin-top:8px; letter-spacing:.03em; }
+.creed h3{ font-size:1.24rem; margin:26px 0 8px; }
+.creed ul{ margin:0; padding:0; list-style:none; }
+.creed li{ padding:9px 0; border-top:1px solid var(--rule); }
+.creed li:first-child{ border-top:0; }
+
+/* ==========================================================================
+   FINE PRINT
+   ========================================================================== */
+.fine h3{ font-family:var(--font-body); font-weight:600; font-size:1rem; margin:24px 0 6px; }
+.fine ul{ margin:0; padding-left:18px; }
+.fine li{ padding:5px 0; color:var(--ink); }
+
+/* ==========================================================================
+   MODAL (photo viewer)
+   ========================================================================== */
+#modal-root:empty{ display:none; }
+.modal-bg{ position:fixed; inset:0; background:rgba(22,24,29,.72); display:flex; align-items:center; justify-content:center; padding:20px; z-index:50; }
+.modal{ background:#fff; border-radius:14px; max-width:520px; width:100%; overflow:hidden; }
+.modal img{ width:100%; display:block; max-height:64vh; object-fit:contain; background:#111; }
+.modal-actions{ display:flex; gap:10px; padding:14px; }
+.modal-actions .btn{ flex:1; }
+
+/* ==========================================================================
+   TOAST
+   ========================================================================== */
+#toast{ position:fixed; left:50%; bottom:22px; transform:translateX(-50%); background:var(--ink); color:var(--paper);
+  padding:10px 16px; border-radius:10px; font-size:.9rem; opacity:0; pointer-events:none; z-index:60; max-width:90vw; text-align:center; }
+#toast.show{ opacity:1; }
+
+/* ==========================================================================
+   PRINT
+   ========================================================================== */
+@page wallchart{ size:landscape; margin:10mm; }
+@page kidcard{ size:portrait; margin:12mm; }
+
+.print-only{ display:none; }
+
+@media print{
+  :root{ --paper:#fff; }
+  body{ background:#fff; color:#000; font-size:11pt; }
+  .skip, #toast, #modal-root{ display:none !important; }
+
+  /* Screen app hidden while printing a sheet */
+  body.printing-wall #app, body.printing-cards #app{ display:none !important; }
+
+  body.printing-wall #print-wall{ display:block; page:wallchart; }
+  body.printing-wall #print-cards{ display:none !important; }
+  body.printing-cards #print-cards{ display:block; }
+  body.printing-cards #print-wall{ display:none !important; }
+
+  #print-wall, #print-cards{ color:#000; }
+
+  /* Wall chart */
+  .wc-h{ font-family:var(--font-mono); font-size:11pt; letter-spacing:.06em; text-transform:uppercase; border-bottom:1px solid #000; padding-bottom:6px; margin-bottom:10px; }
+  table.wc-grid{ width:100%; border-collapse:collapse; margin-bottom:10px; }
+  table.wc-grid th, table.wc-grid td{ border:1px solid #000; padding:6px 8px; text-align:left; font-size:11pt; }
+  table.wc-grid th{ font-family:var(--font-mono); font-size:9pt; letter-spacing:.06em; text-transform:uppercase; }
+  table.wc-grid td.cur{ font-weight:700; text-decoration:underline; }
+  table.wc-grid th.cur{ text-decoration:underline; }
+  .wc-key{ font-size:10pt; margin-bottom:10px; }
+  .wc-key b{ font-family:var(--font-mono); }
+  table.wc-kids{ width:100%; border-collapse:collapse; margin-bottom:10px; }
+  table.wc-kids th, table.wc-kids td{ border-bottom:1px solid #000; padding:5px 8px; text-align:left; font-size:10pt; }
+  table.wc-kids th{ font-family:var(--font-mono); font-size:8.5pt; letter-spacing:.05em; text-transform:uppercase; }
+  .wc-foot{ font-family:var(--font-mono); font-size:9pt; border-top:1px solid #000; padding-top:6px; }
+
+  /* Kid cards */
+  .kidcard-page{ break-inside:avoid; }
+  .kidcard-page:not(:last-child){ break-after:page; }
+  .kc-name{ font-family:var(--font-display); font-size:20pt; }
+  .kc-rule{ border:0; border-top:2px solid #000; width:60px; margin:6px 0 12px; }
+  .kc-sec{ font-family:var(--font-mono); font-size:9pt; letter-spacing:.08em; text-transform:uppercase; margin:12px 0 4px; }
+  .kc-list{ list-style:none; margin:0; padding:0; }
+  .kc-list li{ display:flex; gap:8px; align-items:flex-start; padding:3px 0; break-inside:avoid; page-break-inside:avoid; }
+  .kc-box{ width:12px; height:12px; min-width:12px; border:1px solid #000; margin-top:3px; }
+  .kc-facts{ margin-top:10px; font-size:10pt; }
+  .kc-facts div{ padding:2px 0; }
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<main id="app" tabindex="-1"></main>
+
+<div id="modal-root" aria-live="polite"></div>
+<div id="toast" role="status" aria-live="polite"></div>
+
+<!-- Print surfaces (hidden on screen, shown only when printing) -->
+<div id="print-wall" class="print-only" aria-hidden="true"></div>
+<div id="print-cards" class="print-only" aria-hidden="true"></div>
+
+<!-- Content first, then the app. Both are plain <script> so file:// works. -->
+<script src="data.js"></script>
+<script>
+"use strict";
+/* ==========================================================================
+   PRETE FAMILY RESPONSIBILITIES — APPLICATION
+   All content comes from FAMILY (data.js). No chore text lives in here.
+   ========================================================================== */
+(function(){
+
+var C = FAMILY.config;
+
+/* ---------- tiny helpers ------------------------------------------------- */
+function $(sel, root){ return (root||document).querySelector(sel); }
+function el(tag, cls){ var e=document.createElement(tag); if(cls) e.className=cls; return e; }
+function esc(s){ return String(s).replace(/[&<>"']/g, function(c){
+  return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+function kidById(id){ for(var i=0;i<FAMILY.kids.length;i++){ if(FAMILY.kids[i].id===id) return FAMILY.kids[i]; } return null; }
+function parseISODate(s){ var p=String(s).split('-'); return new Date(+p[0], (+p[1])-1, +p[2]); }
+function pad(n){ return (n<10?'0':'')+n; }
+
+/* ---------- "now" (overridable for testing via ?now=YYYY-MM-DDTHH:MM) ----- */
+function getNow(){
+  try{
+    var q = new URLSearchParams(location.search).get('now');
+    if(q){ var d = new Date(q); if(!isNaN(d.getTime())) return d; }
+  }catch(e){}
+  return new Date();
+}
+
+/* ---------- week + rotation math ---------------------------------------- */
+function startOfWeek(d){
+  // Monday 00:00 of the week containing d (weekStartsOn is Monday=1)
+  var x = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  var dow = x.getDay();                       // 0=Sun..6=Sat
+  var back = (dow === 0) ? 6 : (dow - 1);      // days since Monday
+  x.setDate(x.getDate() - back);
+  return x;
+}
+function isoDay(d){ return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate()); }
+
+function cycleWeekFor(weekStart){
+  var anchor = startOfWeek(parseISODate(C.cycleAnchor.weekStart));
+  var weeks = Math.round((weekStart - anchor) / (7*24*3600*1000));
+  var base = C.cycleAnchor.cycleWeek - 1;
+  return (((base + weeks) % 3) + 3) % 3 + 1;   // 1..3, safe for negatives
+}
+
+function weekContext(now){
+  var weekStart = startOfWeek(now);
+
+  // Deadline day offset from Monday (deadlineDay: 0=Sun => 6 days after Monday)
+  var offset = (C.deadlineDay === 0) ? 6 : (C.deadlineDay - 1);
+  var deadline = new Date(weekStart); deadline.setDate(deadline.getDate()+offset);
+  deadline.setHours(C.deadlineHour, 0, 0, 0);
+
+  // Credit window closes at creditCutoffHour (24 => next Monday 00:00 = week roll)
+  var creditEnd = new Date(weekStart);
+  creditEnd.setDate(creditEnd.getDate() + (C.deadlineDay===0?7:C.deadlineDay));
+  creditEnd.setHours(0,0,0,0);
+  creditEnd.setHours(creditEnd.getHours() + (C.creditCutoffHour - 24));
+
+  // "New week just began" grace window (the Closed acknowledgement)
+  var graceEnd = new Date(weekStart);
+  graceEnd.setHours(graceEnd.getHours() + (C.newWeekGraceHours||0));
+
+  var state, target;
+  if(now < deadline){
+    if((C.newWeekGraceHours||0) > 0 && now < graceEnd){ state='closed'; target=deadline; }
+    else { state='open'; target=deadline; }
+  } else if(now < creditEnd){
+    state='downtime'; target=creditEnd;
+  } else {
+    state='open'; target=deadline;   // defensive; shouldn't occur
+  }
+
+  return {
+    now:now, weekStart:weekStart, weekStartISO:isoDay(weekStart),
+    cycleWeek:cycleWeekFor(weekStart),
+    deadline:deadline, creditEnd:creditEnd, state:state, target:target
+  };
+}
+
+/* ---------- people math -------------------------------------------------- */
+function ageOn(birthISO, now){
+  var b = parseISODate(birthISO);
+  var a = now.getFullYear() - b.getFullYear();
+  var m = now.getMonth() - b.getMonth();
+  if(m < 0 || (m === 0 && now.getDate() < b.getDate())) a--;
+  return a;
+}
+function nextBirthday(birthISO, now){
+  var b = parseISODate(birthISO);
+  var today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  var nb = new Date(now.getFullYear(), b.getMonth(), b.getDate());
+  if(nb <= today) nb = new Date(now.getFullYear()+1, b.getMonth(), b.getDate());
+  return nb;
+}
+function weeklyAllowance(age){ return age * C.allowanceMultiplier; }
+
+function earningPotential(kid, age){
+  var m = C.allowanceMultiplier;
+  var weekly  = age * m * 52;
+  var monthly = age * m * 12;
+  var additional = (C.additionalEarningsByKid && C.additionalEarningsByKid[kid.id]) || 0;
+  // Interest is earned on roughly half of a year's earnings, at the savings rate.
+  var interest = (C.savingsInterestRate / 2) * (weekly + monthly + additional);
+  var total = weekly + monthly + additional + interest;
+  return { weekly:weekly, monthly:monthly, additional:additional, interest:interest, total:total };
+}
+
+/* ---------- rotation lookups -------------------------------------------- */
+function kidLetter(kidId, cw){
+  var row = FAMILY.rotation[cw];
+  for(var k in row){ if(row[k]===kidId) return k; }
+  return '';
+}
+function bathroomFor(kidId, now){
+  var own = FAMILY.bathrooms.own;
+  if(own && own[kidId]) return own[kidId];
+  var sh = FAMILY.bathrooms.shared;
+  if(!sh) return '';
+  if(kidId===sh.evenMonthKid || kidId===sh.oddMonthKid){
+    var month = now.getMonth()+1;
+    var whose = (month % 2 === 0) ? sh.evenMonthKid : sh.oddMonthKid;
+    var a = kidById(sh.evenMonthKid), b = kidById(sh.oddMonthKid);
+    var pair = (a?a.name:'') + ' & ' + (b?b.name:'');
+    if(whose === kidId) return 'Shared bathroom ('+pair+') — your turn this month.';
+    return 'Shared bathroom ('+pair+') — '+kidById(whose).name+"'s turn this month.";
+  }
+  return '';
+}
+function dinnerNightFor(kidId){
+  return kidById(kidId) ? kidById(kidId).dinnerNight : '';
+}
+
+/* ---------- checklist model --------------------------------------------- */
+function buildChecklist(kid, cw){
+  var letter = kidLetter(kid.id, cw);
+  var track = FAMILY.duties[letter];
+  var dutyGroups = track.groups.map(function(g, gi){
+    return {
+      title:g.title, chooseOne:(g.type==='choose-one'),
+      items:g.items.map(function(t, ii){ return { id:'duty.'+letter+'.g'+gi+'.i'+ii, text:t }; })
+    };
+  });
+  var base = FAMILY.baseline[kid.baselineSet];
+  var baseItems = base.items.map(function(t, ii){ return { id:'base.'+kid.baselineSet+'.i'+ii, text:t }; });
+  return { letter:letter, track:track, dutyGroups:dutyGroups, baseLabel:base.label, baseItems:baseItems };
+}
+function progressFor(kid, cw, checks){
+  var cl = buildChecklist(kid, cw);
+  var dTotal=0, dDone=0;
+  cl.dutyGroups.forEach(function(g){
+    if(g.chooseOne){
+      dTotal += 1;
+      var prefix = g.items[0].id.replace(/\.i\d+$/,'');   // e.g. duty.A.g2
+      var any = g.items.some(function(it){ return checks[it.id]; }) || !!checks[prefix+'.na'];
+      if(any) dDone += 1;
+    } else {
+      g.items.forEach(function(it){ dTotal++; if(checks[it.id]) dDone++; });
+    }
+  });
+  var bTotal = cl.baseItems.length, bDone = 0;
+  cl.baseItems.forEach(function(it){ if(checks[it.id]) bDone++; });
+  return { letter:cl.letter, dTotal:dTotal, dDone:dDone, bTotal:bTotal, bDone:bDone,
+           total:dTotal+bTotal, done:dDone+bDone };
+}
+
+/* ---------- check-off storage (localStorage) ---------------------------- */
+function checksKey(weekISO, kidId){ return 'prete.v5.checks.'+weekISO+'.'+kidId; }
+function loadChecks(weekISO, kidId){
+  try{ return JSON.parse(localStorage.getItem(checksKey(weekISO, kidId))) || {}; }
+  catch(e){ return {}; }
+}
+function saveChecks(weekISO, kidId, obj){
+  try{ localStorage.setItem(checksKey(weekISO, kidId), JSON.stringify(obj)); }catch(e){}
+}
+function purgeOldChecks(keepISOs){
+  try{
+    var kill=[];
+    for(var i=0;i<localStorage.length;i++){
+      var k=localStorage.key(i);
+      if(k && k.indexOf('prete.v5.checks.')===0){
+        var ok=false;
+        keepISOs.forEach(function(w){ if(k.indexOf('prete.v5.checks.'+w+'.')===0) ok=true; });
+        if(!ok) kill.push(k);
+      }
+    }
+    kill.forEach(function(k){ localStorage.removeItem(k); });
+  }catch(e){}
+}
+
+/* ---------- formatting --------------------------------------------------- */
+function money(n){ return '$'+Math.round(n).toLocaleString('en-US'); }
+var WD=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+var MO=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+function longDate(d){ return WD[d.getDay()]+', '+MO[d.getMonth()]+' '+d.getDate()+', '+d.getFullYear(); }
+function shortStamp(d){
+  var h=d.getHours(), ap=h>=12?'PM':'AM', h12=h%12; if(h12===0) h12=12;
+  return WD[d.getDay()]+' '+MO[d.getMonth()]+' '+d.getDate()+' · '+h12+':'+pad(d.getMinutes())+' '+ap;
+}
+function birthdayLabel(d){ return MO[d.getMonth()]+' '+d.getDate()+', '+d.getFullYear(); }
+
+/* ---------- inline SVG icons -------------------------------------------- */
+var ICON = {
+  tick:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>',
+  cam:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>',
+  back:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>',
+  fel:'<svg class="fel-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.1 4.9L19 9l-4 3.4L16.2 18 12 15.2 7.8 18 9 12.4 5 9l4.9-1.1z"/></svg>'
+};
+
+/* ---------- toast -------------------------------------------------------- */
+var toastT=null;
+function toast(msg){
+  var t=$('#toast'); t.textContent=msg; t.classList.add('show');
+  clearTimeout(toastT); toastT=setTimeout(function(){ t.classList.remove('show'); }, 2600);
+}
+
+/* ---------- rendering: shared bits -------------------------------------- */
+var CTX = weekContext(getNow());   // recomputed on each full render
+var VIEW = { kid:null, ctx:null, cw:null, weekISO:null };  // active kid context
+
+function brandBar(){
+  return '<div class="brand"><h1>Prete Family Responsibilities</h1>'
+    + '<span class="ver num">v'+esc(C.version)+'</span></div>';
+}
+
+/* A colorful NYC-skyline-at-dawn banner for the top of the home screen —
+   One WTC, the Empire State Building, and the Chrysler spire in silhouette
+   against a rising sun. Signifies early rising and honest city work.
+   Drawn entirely in code (inline SVG) so it works offline with no image files. */
+var HERO_SVG = [
+'<svg class="hero-art" viewBox="0 0 800 320" preserveAspectRatio="xMidYMid slice" aria-hidden="true">',
+'<defs>',
+'<linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">',
+'<stop offset="0" stop-color="#0C1230"/>',
+'<stop offset="0.30" stop-color="#2A2350"/>',
+'<stop offset="0.52" stop-color="#7C3B55"/>',
+'<stop offset="0.68" stop-color="#C1683A"/>',
+'<stop offset="0.80" stop-color="#EBAE52"/>',
+'<stop offset="0.90" stop-color="#C6883F"/>',
+'</linearGradient>',
+'<radialGradient id="sun" cx="0.5" cy="0.5" r="0.5">',
+'<stop offset="0" stop-color="#FFF3D2"/><stop offset="0.55" stop-color="#F6CC77"/><stop offset="1" stop-color="#E7A448"/>',
+'</radialGradient>',
+'<radialGradient id="glow" cx="0.5" cy="0.5" r="0.5">',
+'<stop offset="0" stop-color="#F4C56A" stop-opacity="0.55"/><stop offset="1" stop-color="#F4C56A" stop-opacity="0"/>',
+'</radialGradient>',
+'</defs>',
+'<rect width="800" height="320" fill="url(#sky)"/>',
+'<g fill="#FDF6E3">',
+'<circle cx="70" cy="42" r="1.2" opacity="0.5"/><circle cx="150" cy="70" r="0.9" opacity="0.4"/>',
+'<circle cx="250" cy="34" r="1.1" opacity="0.5"/><circle cx="360" cy="58" r="0.8" opacity="0.35"/>',
+'<circle cx="470" cy="40" r="1" opacity="0.45"/><circle cx="690" cy="52" r="1.1" opacity="0.5"/><circle cx="762" cy="30" r="0.9" opacity="0.4"/>',
+'</g>',
+'<circle cx="600" cy="205" r="120" fill="url(#glow)"/>',
+'<g stroke="#F6D48A" stroke-width="2" opacity="0.22" stroke-linecap="round">',
+'<line x1="600" y1="205" x2="600" y2="72"/><line x1="600" y1="205" x2="712" y2="112"/><line x1="600" y1="205" x2="488" y2="112"/>',
+'<line x1="600" y1="205" x2="748" y2="205"/><line x1="600" y1="205" x2="452" y2="205"/>',
+'</g>',
+'<circle cx="600" cy="205" r="52" fill="url(#sun)"/>',
+'<path fill="#3A3358" opacity="0.5" d="M0,320 L0,262 L70,262 L70,240 L150,240 L150,258 L230,258 L230,232 L320,232 L320,254 L410,254 L410,238 L510,238 L510,258 L600,258 L600,236 L700,236 L700,256 L800,256 L800,320 Z"/>',
+'<g fill="#0E1220">',
+'<rect x="0" y="250" width="46" height="70"/><rect x="48" y="232" width="48" height="88"/><rect x="98" y="214" width="40" height="106"/>',
+'<rect x="116" y="150" width="22" height="170"/>',
+'<rect x="150" y="212" width="42" height="108"/><rect x="196" y="228" width="44" height="92"/>',
+'<rect x="246" y="180" width="66" height="140"/><rect x="262" y="150" width="34" height="34"/><rect x="272" y="128" width="14" height="28"/>',
+'<rect x="316" y="222" width="12" height="98"/>',
+'<rect x="332" y="192" width="44" height="128"/>',
+'<rect x="386" y="208" width="46" height="112"/><rect x="438" y="188" width="44" height="132"/><rect x="488" y="164" width="44" height="156"/>',
+'<rect x="538" y="216" width="48" height="104"/><rect x="592" y="200" width="46" height="120"/><rect x="644" y="226" width="44" height="94"/>',
+'<rect x="694" y="198" width="46" height="122"/><rect x="746" y="218" width="54" height="102"/>',
+'<polygon points="332,192 354,124 376,192"/>',
+'</g>',
+'<g stroke="#0E1220" stroke-width="3" stroke-linecap="round">',
+'<line x1="127" y1="150" x2="127" y2="96"/><line x1="279" y1="128" x2="279" y2="90"/><line x1="354" y1="124" x2="354" y2="100"/>',
+'</g>',
+'<g fill="#F3C979" opacity="0.85">',
+'<rect x="122" y="176" width="3" height="6"/><rect x="129" y="198" width="3" height="6"/>',
+'<rect x="258" y="200" width="3" height="6"/><rect x="286" y="212" width="3" height="6"/>',
+'<rect x="346" y="210" width="3" height="6"/><rect x="360" y="232" width="3" height="6"/>',
+'<rect x="500" y="184" width="3" height="6"/><rect x="512" y="208" width="3" height="6"/>',
+'<rect x="62" y="252" width="3" height="6"/><rect x="708" y="216" width="3" height="6"/>',
+'</g>',
+'</svg>'
+].join('');
+
+function heroBanner(ctx){
+  var eps = FAMILY.principles && FAMILY.principles.epigraphs;
+  var epi = (eps && eps[0]) ? eps[0] : { text:'', cite:'' };
+  var stateWord = ctx.state==='downtime' ? 'Downtime' : (ctx.state==='closed' ? 'New week' : 'Open');
+  var dots = FAMILY.kids.slice(0,3).map(function(k){
+    return '<span style="background:'+k.accent+'"></span>';
+  }).join('');
+  return '<header class="hero-banner">'
+    + HERO_SVG
+    + '<div class="hero-copy">'
+    + '<div class="hero-top">'
+    +   '<span class="hero-kicker">New York City</span>'
+    +   '<span class="hero-chip num">Week '+ctx.cycleWeek+' · '+esc(stateWord)+'</span>'
+    + '</div>'
+    + '<h1 class="hero-title">Prete Family Responsibilities</h1>'
+    + '<div class="hero-dots" aria-hidden="true">'+dots+'</div>'
+    + '<p class="hero-quote">“'+esc(epi.text)+'” <cite>'+esc(epi.cite)+'</cite></p>'
+    + '</div></header>';
+}
+function backLink(){
+  return '<a class="back" href="#/">'+ICON.back+'Home</a>';
+}
+
+/* =========================================================================
+   HOME
+   ========================================================================= */
+function renderHome(){
+  var ctx=CTX, now=ctx.now, cw=ctx.cycleWeek;
+  var h='';
+  h+=heroBanner(ctx);
+
+  // Lively "this week" status panel (date, week, live countdown, state)
+  h+=weekPanelHTML(ctx);
+
+  // Rotation dial
+  h+='<p class="home-label">Whose turn — this week &amp; next</p>';
+  h+=dialHTML(cw);
+
+  // Kid cards
+  h+='<p class="home-label spaced">Everyone this week — tap a name</p>';
+  h+='<section class="cards">';
+  FAMILY.kids.forEach(function(k){
+    var letter=kidLetter(k.id, cw);
+    var summary=FAMILY.duties[letter].summary;
+    var checks=loadChecks(ctx.weekStartISO, k.id);
+    var pr=progressFor(k, cw, checks);
+    var done=(pr.total>0 && pr.done===pr.total);
+    var bath=bathroomFor(k.id, now);
+    h+='<a class="card" href="#/'+k.id+'" style="--kidaccent:'+k.accent+'">'
+      +'<div class="card-top"><span class="card-letter">'+letter+'</span>'
+      +'<div><div class="card-name">'+esc(k.name)+'</div>'
+      +'<div class="card-summary">'+esc(FAMILY.duties[letter].label)+' — '+esc(summary)+'</div>'
+      +(k.withParent?'<span class="card-with">'+esc('All duties with Mom or Dad')+'</span>':'')
+      +'</div></div>'
+      +'<div class="card-meta">'
+      +'<span>Dinner: <b>'+esc(k.dinnerNight)+'</b></span>'
+      +(bath?'<span>'+esc(bathShort(bath))+'</span>':'')
+      +'<span class="card-done">'+(done?'Done':(pr.done+' / '+pr.total))+'</span>'
+      +'</div></a>';
+  });
+  h+='</section>';
+
+  // Quiet link row
+  h+='<nav class="link-row" aria-label="More">'
+    +'<a href="#/money">Money</a>'
+    +'<a href="#/principles">Principles</a>'
+    +'<a href="#/fineprint">Fine print</a></nav>';
+
+  // Print buttons
+  h+='<div class="actions" style="margin-top:22px">'
+    +'<button class="btn btn-quiet" id="print-wall-btn">Print wall chart</button>'
+    +'<button class="btn btn-quiet" id="print-cards-btn">Print kid cards</button></div>';
+
+  setView(h);
+
+  $('#print-wall-btn').addEventListener('click', function(){ doPrint('wall'); });
+  $('#print-cards-btn').addEventListener('click', function(){ doPrint('cards'); });
+
+  startCountdown(ctx);
+}
+
+function bathShort(text){
+  // Compact the bathroom sentence for the small home card.
+  if(/your own bathroom/i.test(text)) return 'Bathroom: own';
+  if(/your turn/i.test(text)) return 'Bathroom: your turn';
+  var m=text.match(/—\s*([A-Za-z]+)'s turn/); if(m) return 'Bathroom: '+m[1];
+  return 'Bathroom';
+}
+
+function weekPanelHTML(ctx){
+  var sunday=new Date(ctx.weekStart); sunday.setDate(sunday.getDate()+6);
+  var endLabel='Ends '+WD[sunday.getDay()]+' · '+MO[sunday.getMonth()]+' '+sunday.getDate();
+  var stateCls = ctx.state==='downtime' ? ' downtime' : (ctx.state==='closed' ? ' closed' : '');
+  var stateWord = ctx.state==='downtime' ? 'Downtime' : (ctx.state==='closed' ? 'New week' : 'Open');
+  var target = (ctx.state==='downtime') ? 'until 11:59 PM Sunday' : 'until 3:00 PM Sunday';
+  var sub;
+  if(ctx.state==='open'){ sub='Chores due 3:00 PM Sunday. Work before play — checked off before the deadline.'; }
+  else if(ctx.state==='downtime'){ sub='Downtime has started — no screens, no friends, no recreation until you’re done. Full credit still counts until 11:59 PM.'; }
+  else { sub='A new week has begun. The rotation has advanced; last week is now closed.'; }
+  return '<section class="week-panel">'
+    +'<div class="wp-head"><p class="eyebrow">This week</p>'
+    +'<span class="wp-end">'+esc(endLabel)+'</span></div>'
+    +'<h2 class="wp-title">Week <span class="num">'+ctx.cycleWeek+'</span> of the rotation</h2>'
+    +'<div class="wp-status'+stateCls+'">'
+    +'<span class="wp-state">'+esc(stateWord)+'</span>'
+    +'<div class="wp-clockwrap"><div class="wp-clock num" id="wp-clock">—</div>'
+    +'<div class="wp-target" id="wp-target">'+esc(target)+'</div></div>'
+    +'</div>'
+    +'<p class="wp-sub">'+esc(sub)+'</p>'
+    +'</section>';
+}
+
+var cdTimer=null;
+function startCountdown(ctx){
+  if(cdTimer){ clearInterval(cdTimer); cdTimer=null; }
+  function tick(){
+    var clockEl=document.getElementById('wp-clock'); if(!clockEl){ clearInterval(cdTimer); cdTimer=null; return; }
+    var now=getNow();
+    // If the state boundary is crossed, re-render the home view fresh.
+    var fresh=weekContext(now);
+    if(fresh.state!==ctx.state || fresh.weekStartISO!==ctx.weekStartISO){
+      CTX=fresh; if(currentRoute()==='home') renderHome(); return;
+    }
+    var ms=ctx.target - now;
+    if(ms<0) ms=0;
+    var s=Math.floor(ms/1000);
+    var d=Math.floor(s/86400); s-=d*86400;
+    var hh=Math.floor(s/3600); s-=hh*3600;
+    var mm=Math.floor(s/60); var ss=s-mm*60;
+    clockEl.textContent=(d>0?(d+'d '):'')+pad(hh)+':'+pad(mm)+':'+pad(ss);
+  }
+  tick();
+  cdTimer=setInterval(tick, 1000);
+}
+
+function dialHTML(cw){
+  var h='<section class="dial" aria-label="Three-week rotation">';
+  [1,2,3].forEach(function(w){
+    var cur=(w===cw);
+    h+='<div class="dial-col'+(cur?' current':'')+'">';
+    h+='<div class="dial-week">Week '+w+'</div>';
+    ['A','B','C'].forEach(function(T){
+      var kid=kidById(FAMILY.rotation[w][T]);
+      h+='<div class="dial-row"><span class="dial-track">'+T+'</span>'
+        +'<span class="dial-name">'+esc(kid.name)+'</span></div>';
+    });
+    h+='</div>';
+  });
+  h+='</section>';
+  return h;
+}
+
+/* =========================================================================
+   KID VIEW
+   ========================================================================= */
+function renderKid(kidId){
+  var kid=kidById(kidId); if(!kid){ location.hash='#/'; return; }
+  document.body.setAttribute('data-kid', kid.id);
+  var ctx=CTX, now=ctx.now, cw=ctx.cycleWeek;
+  var age=ageOn(kid.birthdate, now);
+  var allow=weeklyAllowance(age);
+  var cl=buildChecklist(kid, cw);
+  var checks=loadChecks(ctx.weekStartISO, kid.id);
+  var ep=earningPotential(kid, age);
+  var nb=nextBirthday(kid.birthdate, now);
+  var newAllow=weeklyAllowance(age+1);
+  var bath=bathroomFor(kid.id, now);
+
+  var h='';
+  h+=backLink();
+
+  h+='<header class="kid-head"><span class="kid-letter">'+cl.letter+'</span>'
+    +'<div><div class="kid-name">'+esc(kid.name)+'</div>'
+    +'<div class="kid-sub">Age <span class="num">'+age+'</span> · '
+    +esc(FAMILY.duties[cl.letter].label)+' this week · '+esc(kid.accentName)+'</div>'
+    +(kid.withParent?'<div class="kid-sub" style="font-style:italic">'+esc('All duties are done with Mom or Dad.')+'</div>':'')
+    +'</div></header>';
+
+  // Hero — illustrative yearly potential (the motivating number)
+  h+='<section class="hero"><p class="eyebrow">Illustrative — a full year of steady work</p>'
+    +'<div class="big num">'+money(ep.total)+'</div>'
+    +'<div class="cap">Allowance, monthly chores, extra jobs, and '+(C.savingsInterestRate*100)+'% interest combined. A picture of what’s possible, not a promise.</div></section>';
+
+  // Persistent tracker note
+  h+='<p class="tracker-note">This is your own tracker. Official check-off is still in person or by text — with Mom or Dad.</p>';
+
+  // Progress
+  var pr=progressFor(kid, cw, checks);
+  h+='<div class="progress" id="prog-wrap"><span id="prog-text">'
+    +'<span class="done"><span class="num">'+pr.done+'</span></span> of <span class="num">'+pr.total+'</span> checked</span>'
+    +'<div class="progress-bar"><span id="prog-bar" style="width:'+(pr.total?Math.round(pr.done/pr.total*100):0)+'%"></span></div>'
+    +'<div class="all-done" id="all-done" '+((pr.total>0&&pr.done===pr.total)?'':'style="display:none"')+'>You’re done for the week.</div>'
+    +'</div>';
+
+  // How to mark items
+  h+='<p class="tracker-note">Mark each item <b>Done</b> or <b>N/A</b> — either one counts as full credit.</p>';
+
+  // Rotating duty checklist
+  h+='<h2 class="section-title">'+esc(FAMILY.duties[cl.letter].label)+'</h2>';
+  cl.dutyGroups.forEach(function(g){
+    h+='<div class="group-title">'+esc(g.title)+(g.chooseOne?' <span class="hint">— choose one</span>':'')+'</div>';
+    if(g.chooseOne){
+      var prefix=g.items[0].id.replace(/\.i\d+$/,'');
+      h+='<ul class="list">';
+      g.items.forEach(function(it){ h+=optHTML(kid, it, checks, prefix); });
+      h+=optHTML(kid, { id:prefix+'.na', text:'N/A — none needed this week', na:true }, checks, prefix);
+      h+='</ul>';
+    } else {
+      h+='<ul class="list">';
+      g.items.forEach(function(it){ h+=itemHTML(kid, it, checks); });
+      h+='</ul>';
+    }
+  });
+
+  // Baseline checklist
+  h+='<h2 class="section-title">'+esc(cl.baseLabel)+'</h2><ul class="list">';
+  cl.baseItems.forEach(function(it){ h+=itemHTML(kid, it, checks); });
+  h+='</ul>';
+
+  // Facts
+  h+='<div class="factrow">';
+  h+='<div class="fact"><span class="k">Dinner night</span><span class="v">'+esc(kid.dinnerNight)+'</span></div>';
+  if(bath) h+='<div class="fact"><span class="k">Bathroom</span><span class="v">'+esc(bath)+'</span></div>';
+  h+='<div class="fact"><span class="k">Weekly allowance</span><span class="v num">'+money(allow)+'</span></div>';
+  h+='<div class="fact"><span class="k">Goes up on '+esc(birthdayLabel(nb))+'</span><span class="v num">'+money(newAllow)+'/wk</span></div>';
+  h+='</div>';
+
+  // Additional-chore opportunities for this kid
+  var opts=FAMILY.additional.filter(function(a){ return a.who.indexOf(kid.id)!==-1; });
+  h+='<h2 class="section-title">Extra jobs, for extra pay</h2>';
+  if(opts.length){
+    h+='<ul class="optlist">';
+    opts.forEach(function(o){ h+='<li>'+esc(o.text)+'</li>'; });
+    h+='</ul>';
+  } else {
+    h+='<p class="muted">Ask Mom or Dad about extra jobs you can take on.</p>';
+  }
+
+  // Big check-off action at the very bottom of the list
+  h+='<div class="checkoff-wrap">'
+    +'<button class="btn btn-primary btn-block btn-xl" id="check-off" type="button">Check Off with Mom / Dad</button>'
+    +'<p class="checkoff-note">Sends Mom or Dad this week’s progress so they can check you off.</p>'
+    +'<div class="mini" style="justify-content:center"><button id="reset-week" type="button">Reset my week</button></div>'
+    +'</div>';
+
+  setView(h);
+  wireKid(kid, ctx, cw);
+}
+
+// A regular checklist item: text + a Done / N/A control (either = full credit).
+function itemHTML(kid, it, checks){
+  var icon=(kid.withParent)?ICON.fel:'';
+  var val=checks[it.id];
+  var marked=(val==='done'||val==='na');
+  return '<li class="item'+(marked?' marked':'')+'" data-id="'+esc(it.id)+'">'
+    +'<span class="txt">'+icon+esc(it.text)+'</span>'
+    +'<span class="mark" role="group" aria-label="Mark done or not applicable">'
+    +'<button type="button" class="mk mk-done" data-mark="done" data-id="'+esc(it.id)+'" aria-pressed="'+(val==='done')+'">Done</button>'
+    +'<button type="button" class="mk mk-na" data-mark="na" data-id="'+esc(it.id)+'" aria-pressed="'+(val==='na')+'">N/A</button>'
+    +'</span></li>';
+}
+
+// A choose-one option (deep-clean list). Selecting one — or the N/A option —
+// completes the whole group for full credit.
+function optHTML(kid, it, checks, groupPrefix){
+  var icon=(kid.withParent && !it.na)?ICON.fel:'';
+  var sel=!!checks[it.id];
+  return '<li class="item opt-item'+(it.na?' opt-na':'')+'">'
+    +'<button type="button" class="opt" data-choose="1" data-group="'+esc(groupPrefix)+'" data-id="'+esc(it.id)+'" aria-pressed="'+sel+'">'
+    +'<span class="opt-dot"></span><span class="txt">'+icon+esc(it.text)+'</span>'
+    +'</button></li>';
+}
+
+function wireKid(kid, ctx, cw){
+  // Store the active kid context; the delegated #app handlers (attached once
+  // in boot) read from here. This avoids stacking duplicate listeners on the
+  // persistent #app element every time a kid view re-renders.
+  VIEW.kid=kid; VIEW.ctx=ctx; VIEW.cw=cw; VIEW.weekISO=ctx.weekStartISO;
+
+  // These buttons are re-created on each render, so per-element listeners are
+  // safe here — the old elements (and their listeners) are discarded on render.
+  $('#check-off').addEventListener('click', function(){ checkOff(kid, ctx, cw); });
+  $('#reset-week').addEventListener('click', function(){ resetWeek(kid, ctx.weekStartISO, cw); });
+}
+
+// Delegated CLICK handler — attached ONCE (see boot). Acts only on a kid view.
+// Handles the Done/N/A marks and the choose-one single-select options.
+function onAppClick(e){
+  if(!VIEW.kid) return;
+  var kid=VIEW.kid, weekISO=VIEW.weekISO, cw=VIEW.cw;
+
+  var mk=e.target.closest && e.target.closest('button[data-mark]');
+  if(mk){
+    var id=mk.getAttribute('data-id'), val=mk.getAttribute('data-mark');
+    var checks=loadChecks(weekISO, kid.id);
+    if(checks[id]===val) delete checks[id]; else checks[id]=val;   // toggle
+    saveChecks(weekISO, kid.id, checks);
+    var li=mk.closest('li.item');
+    li.querySelectorAll('button[data-mark]').forEach(function(b){
+      b.setAttribute('aria-pressed', checks[id]===b.getAttribute('data-mark') ? 'true':'false');
+    });
+    li.classList.toggle('marked', checks[id]==='done'||checks[id]==='na');
+    updateProgress(kid, cw, checks);
+    return;
+  }
+
+  var opt=e.target.closest && e.target.closest('button[data-choose]');
+  if(opt){
+    var oid=opt.getAttribute('data-id'), group=opt.getAttribute('data-group');
+    var checks2=loadChecks(weekISO, kid.id);
+    var wasSel=!!checks2[oid];
+    // clear every option in this group (including N/A), then set the clicked one
+    $('#app').querySelectorAll('button[data-choose][data-group="'+CSS.escape(group)+'"]').forEach(function(b){
+      delete checks2[b.getAttribute('data-id')]; b.setAttribute('aria-pressed','false');
+    });
+    if(!wasSel){ checks2[oid]='done'; opt.setAttribute('aria-pressed','true'); }
+    saveChecks(weekISO, kid.id, checks2);
+    updateProgress(kid, cw, checks2);
+    return;
+  }
+}
+
+function updateProgress(kid, cw, checks){
+  var pr=progressFor(kid, cw, checks);
+  var pt=$('#prog-text'); if(pt){
+    pt.innerHTML='<span class="done"><span class="num">'+pr.done+'</span></span> of <span class="num">'+pr.total+'</span> checked';
+  }
+  var bar=$('#prog-bar'); if(bar) bar.style.width=(pr.total?Math.round(pr.done/pr.total*100):0)+'%';
+  var ad=$('#all-done'); if(ad) ad.style.display=(pr.total>0&&pr.done===pr.total)?'':'none';
+}
+
+/* ---------- check off with Mom / Dad ------------------------------------ */
+// Builds the plain-text summary that gets texted to a parent.
+function buildMessage(kid, ctx, cw){
+  var checks=loadChecks(ctx.weekStartISO, kid.id);
+  var pr=progressFor(kid, cw, checks);
+  var dutyDone=(pr.dDone===pr.dTotal);
+  var baseDone=(pr.bDone===pr.bTotal);
+  var allDone=(pr.total>0 && pr.done===pr.total);
+  var lines=[];
+  lines.push(kid.name+' — Week '+cw+(allDone?' chores done':' chores update'));
+  lines.push(shortStamp(getNow()));
+  lines.push(FAMILY.duties[pr.letter].label+': '+pr.dDone+' of '+pr.dTotal+(dutyDone?' ✓':''));
+  lines.push('Baseline: '+pr.bDone+' of '+pr.bTotal+(baseDone?' ✓':''));
+  return lines.join('\n');
+}
+// Opens a pre-filled text to the parents (numbers come from data.js). If no
+// numbers are configured, it just reminds the kid to check off in person.
+function checkOff(kid, ctx, cw){
+  var body=buildMessage(kid, ctx, cw);
+  var phones=(C.parents||[]).map(function(p){ return p.phone; }).filter(Boolean);
+  // With numbers configured, address the text to the parents (the kid sends to
+  // whichever one is checking them off). Without numbers (e.g. a publicly shared
+  // copy with the numbers removed), open a blank message the kid addresses by hand.
+  var url = phones.length
+    ? 'sms:'+phones.join(',')+'&body='+encodeURIComponent(body)
+    : 'sms:&body='+encodeURIComponent(body);
+  location.href=url;
+}
+function resetWeek(kid, weekISO, cw){
+  if(!window.confirm('Reset this week for '+kid.name+'? This clears the check-offs on this device only.')) return;
+  try{ localStorage.removeItem(checksKey(weekISO, kid.id)); }catch(e){}
+  renderKid(kid.id);
+  toast('Your week has been reset.');
+}
+
+/* =========================================================================
+   MONEY
+   ========================================================================= */
+function renderMoney(){
+  document.body.removeAttribute('data-kid');
+  var now=CTX.now;
+  var h='';
+  h+=backLink();
+  h+='<h1 class="kid-name" style="font-size:2rem;margin-top:6px">Money</h1>';
+  h+='<hr class="rule-accent" style="--accent:var(--ink)">';
+  h+='<p>'+esc(FAMILY.money.intro)+'</p>';
+
+  // Allowance table
+  h+='<table class="table"><thead><tr><th>Name</th><th class="n">Age</th><th class="n">Weekly</th></tr></thead><tbody>';
+  FAMILY.kids.forEach(function(k){
+    var age=ageOn(k.birthdate, now);
+    h+='<tr><td>'+esc(k.name)+'</td><td class="n">'+age+'</td><td class="n">'+money(weeklyAllowance(age))+'</td></tr>';
+  });
+  h+='</tbody></table>';
+  h+='<p class="muted" style="font-size:.86rem">Weekly allowance is age × '+C.allowanceMultiplier+'. Monthly chore pay is the same, at full completion.</p>';
+
+  // Waterfall 10 / 40 / 50
+  var sp=C.split;
+  h+='<h2 class="section-title" style="--accent:var(--ink)">Where each family dollar goes</h2>';
+  h+='<div class="waterfall">'
+    +'<div class="seg s-tithe" style="width:'+(sp.tithing*100)+'%">'+(sp.tithing*100)+'%</div>'
+    +'<div class="seg s-save" style="width:'+(sp.savings*100)+'%">'+(sp.savings*100)+'%</div>'
+    +'<div class="seg s-spend" style="width:'+(sp.spending*100)+'%">'+(sp.spending*100)+'%</div></div>';
+  h+='<div class="waterlegend">'
+    +'<div><span class="pct num">'+(sp.tithing*100)+'%</span>'+esc(FAMILY.money.splitLabels.tithing)+'</div>'
+    +'<div><span class="pct num">'+(sp.savings*100)+'%</span>'+esc(FAMILY.money.splitLabels.savings)+'</div>'
+    +'<div><span class="pct num">'+(sp.spending*100)+'%</span>'+esc(FAMILY.money.splitLabels.spending)+'</div></div>';
+
+  // Earning potential
+  h+='<h2 class="section-title" style="--accent:var(--ink)">What a year can add up to</h2>';
+  h+='<p class="muted" style="font-size:.9rem">'+esc(FAMILY.money.potentialNote)+'</p>';
+  h+='<div class="potential">';
+  FAMILY.kids.forEach(function(k){
+    var age=ageOn(k.birthdate, now);
+    var ep=earningPotential(k, age);
+    h+='<div class="pcard" data-k="'+k.id+'"><div class="who">'+esc(k.name)+'</div>'
+      +'<div class="ptotal num">'+money(ep.total)+'</div>'
+      +'<div class="pbreak">Allowance '+money(ep.weekly)+' · Monthly '+money(ep.monthly)
+      +' · Extra '+money(ep.additional)+' · Interest '+money(ep.interest)+'</div>'
+      +'<div class="pstep">Allowance is <span class="num">'+money(weeklyAllowance(age))+'</span>/week now; '
+      +'<span class="num">'+money(weeklyAllowance(age+1))+'</span>/week from '+esc(birthdayLabel(nextBirthday(k.birthdate, now)))+'.</div>'
+      +'</div>';
+  });
+  h+='</div>';
+
+  h+='<hr class="rule">';
+  h+='<p>'+esc(FAMILY.money.covers)+'</p>';
+
+  // Outside earnings & gifts — the modified waterfall (10 / 30 / 60)
+  var os=C.outsideSplit;
+  h+='<h2 class="section-title" style="--accent:var(--ink)">Outside earnings &amp; gifts</h2>';
+  h+='<div class="waterfall">'
+    +'<div class="seg s-tithe" style="width:'+(os.tithing*100)+'%">'+(os.tithing*100)+'%</div>'
+    +'<div class="seg s-save" style="width:'+(os.savings*100)+'%">'+(os.savings*100)+'%</div>'
+    +'<div class="seg s-spend" style="width:'+(os.spending*100)+'%">'+(os.spending*100)+'%</div></div>';
+  h+='<div class="waterlegend">'
+    +'<div><span class="pct num">'+(os.tithing*100)+'%</span>Tithing — pay the Lord first</div>'
+    +'<div><span class="pct num">'+(os.savings*100)+'%</span>Long-term savings</div>'
+    +'<div><span class="pct num">'+(os.spending*100)+'%</span>Spend anywhere</div></div>';
+  h+='<p>'+esc(FAMILY.money.outside)+'</p>';
+  h+='<p class="muted">'+esc(FAMILY.money.rateNote)+'</p>';
+
+  setView(h);
+}
+
+/* =========================================================================
+   PRINCIPLES
+   ========================================================================= */
+function renderPrinciples(){
+  document.body.removeAttribute('data-kid');
+  var p=FAMILY.principles;
+  var h='';
+  h+=backLink();
+  h+='<h1 class="kid-name" style="font-size:2rem;margin-top:6px">Principles</h1>';
+  h+='<hr class="rule-accent" style="--accent:var(--ink)">';
+
+  h+='<div class="epigraphs">';
+  p.epigraphs.forEach(function(e){
+    h+='<blockquote class="epigraph"><p>'+esc(e.text)+'</p><cite>'+esc(e.cite)+'</cite></blockquote>';
+  });
+  h+='</div>';
+
+  h+='<div class="creed"><h3>'+esc(p.believeHeading)+'</h3><ul>';
+  p.believe.forEach(function(t){ h+='<li>'+esc(t)+'</li>'; });
+  h+='</ul>';
+
+  h+='<h3>'+esc(p.circumstancesHeading)+'</h3><ul>';
+  p.circumstances.forEach(function(t){ h+='<li>'+esc(t)+'</li>'; });
+  h+='</ul>';
+
+  h+='<h3>'+esc(p.doNotHeading)+'</h3><ul>';
+  p.doNot.forEach(function(t){ h+='<li>'+esc(t)+'</li>'; });
+  h+='</ul></div>';
+
+  setView(h);
+}
+
+/* =========================================================================
+   FINE PRINT
+   ========================================================================= */
+function renderFinePrint(){
+  document.body.removeAttribute('data-kid');
+  var h='';
+  h+=backLink();
+  h+='<h1 class="kid-name" style="font-size:2rem;margin-top:6px">Fine print</h1>';
+  h+='<hr class="rule-accent" style="--accent:var(--ink)">';
+  h+='<div class="fine">';
+  FAMILY.fineprint.sections.forEach(function(sec){
+    h+='<h3>'+esc(sec.heading)+'</h3><ul>';
+    sec.items.forEach(function(t){ h+='<li>'+esc(t)+'</li>'; });
+    h+='</ul>';
+  });
+  h+='</div>';
+  setView(h);
+}
+
+/* =========================================================================
+   PRINT SURFACES
+   ========================================================================= */
+function buildWallChart(){
+  var now=CTX.now, cw=CTX.cycleWeek;
+  var wrap=$('#print-wall');
+  var h='';
+  h+='<div class="wc-h">Prete Family Responsibilities · v'+esc(C.version)+' · '+esc(longDate(now))+'</div>';
+
+  // 3x3 grid
+  h+='<table class="wc-grid"><thead><tr><th></th>';
+  [1,2,3].forEach(function(w){ h+='<th class="'+(w===cw?'cur':'')+'">Week '+w+(w===cw?' (now)':'')+'</th>'; });
+  h+='</tr></thead><tbody>';
+  ['A','B','C'].forEach(function(T){
+    h+='<tr><th>'+T+' Duties</th>';
+    [1,2,3].forEach(function(w){
+      var kid=kidById(FAMILY.rotation[w][T]);
+      h+='<td class="'+(w===cw?'cur':'')+'">'+esc(kid.name)+'</td>';
+    });
+    h+='</tr>';
+  });
+  h+='</tbody></table>';
+
+  // Key
+  h+='<div class="wc-key"><b>A</b> '+esc(FAMILY.duties.A.summary)
+    +' &nbsp;·&nbsp; <b>B</b> '+esc(FAMILY.duties.B.summary)
+    +' &nbsp;·&nbsp; <b>C</b> '+esc(FAMILY.duties.C.summary)+'</div>';
+
+  // Per-kid row
+  h+='<table class="wc-kids"><thead><tr><th>Name</th><th>Dinner</th><th>Bathroom</th><th>Weekly</th></tr></thead><tbody>';
+  FAMILY.kids.forEach(function(k){
+    var age=ageOn(k.birthdate, now);
+    h+='<tr><td>'+esc(k.name)+'</td><td>'+esc(k.dinnerNight)+'</td>'
+      +'<td>'+esc(bathShort(bathroomFor(k.id, now)))+'</td>'
+      +'<td>'+money(weeklyAllowance(age))+'</td></tr>';
+  });
+  h+='</tbody></table>';
+
+  h+='<div class="wc-foot">Chores due 3pm Sunday · downtime starts 3pm · credit until 11:59pm</div>';
+  wrap.innerHTML=h;
+}
+function buildKidCards(){
+  var now=CTX.now, cw=CTX.cycleWeek;
+  var wrap=$('#print-cards');
+  var h='';
+  FAMILY.kids.forEach(function(kid){
+    var age=ageOn(kid.birthdate, now);
+    var cl=buildChecklist(kid, cw);
+    var bath=bathroomFor(kid.id, now);
+    h+='<section class="kidcard-page">';
+    h+='<div class="kc-name">'+esc(kid.name)+' · age '+age+'</div>';
+    h+='<hr class="kc-rule" style="border-top-color:'+kid.accent+'">';
+    h+='<div class="kc-sec">'+esc(FAMILY.duties[cl.letter].label)+' (Week '+cw+')</div>';
+    cl.dutyGroups.forEach(function(g){
+      h+='<div class="kc-sec">'+esc(g.title)+(g.chooseOne?' — choose one':'')+'</div><ul class="kc-list">';
+      g.items.forEach(function(it){ h+='<li><span class="kc-box"></span><span>'+esc(it.text)+'</span></li>'; });
+      h+='</ul>';
+    });
+    h+='<div class="kc-sec">'+esc(cl.baseLabel)+'</div><ul class="kc-list">';
+    cl.baseItems.forEach(function(it){ h+='<li><span class="kc-box"></span><span>'+esc(it.text)+'</span></li>'; });
+    h+='</ul>';
+    h+='<div class="kc-facts"><div><b>Dinner night:</b> '+esc(kid.dinnerNight)+'</div>';
+    if(bath) h+='<div><b>Bathroom:</b> '+esc(bath)+'</div>';
+    h+='<div><b>Weekly allowance:</b> '+money(weeklyAllowance(age))+'</div></div>';
+    h+='</section>';
+  });
+  wrap.innerHTML=h;
+}
+function doPrint(which){
+  CTX=weekContext(getNow());
+  if(which==='wall'){ buildWallChart(); document.body.classList.add('printing-wall'); }
+  else { buildKidCards(); document.body.classList.add('printing-cards'); }
+  var cleanup=function(){
+    document.body.classList.remove('printing-wall');
+    document.body.classList.remove('printing-cards');
+    window.removeEventListener('afterprint', cleanup);
+  };
+  window.addEventListener('afterprint', cleanup);
+  setTimeout(function(){ window.print(); }, 60);
+  // Fallback cleanup in case afterprint doesn't fire
+  setTimeout(cleanup, 1500);
+}
+
+/* =========================================================================
+   ROUTER
+   ========================================================================= */
+function currentRoute(){
+  var hash=(location.hash||'').replace(/^#\/?/, '');
+  if(hash==='' ) return 'home';
+  if(hash==='money' || hash==='principles' || hash==='fineprint') return hash;
+  if(kidById(hash)) return 'kid:'+hash;
+  return 'home';
+}
+var lastRoute=null;
+function route(){
+  if(cdTimer){ clearInterval(cdTimer); cdTimer=null; }
+  CTX=weekContext(getNow());
+  VIEW.kid=null;   // clear active kid context; renderKid resets it
+  var r=currentRoute();
+  lastRoute=r;
+  if(r==='home'){ document.body.removeAttribute('data-kid'); renderHome(); }
+  else if(r.indexOf('kid:')===0){ renderKid(r.slice(4)); }
+  else if(r==='money'){ renderMoney(); }
+  else if(r==='principles'){ renderPrinciples(); }
+  else if(r==='fineprint'){ renderFinePrint(); }
+  else { renderHome(); }
+  // Move focus to main for screen-reader + keyboard users
+  var app=$('#app'); if(app){ app.focus({preventScroll:true}); }
+  window.scrollTo(0,0);
+}
+function currentRouteName(){ return lastRoute==='home'?'home':lastRoute; }
+
+/* Crossfade wrapper */
+function setView(html){
+  // Insert content SYNCHRONOUSLY so callers can wire up buttons / start the
+  // countdown immediately after. The crossfade is applied to the freshly
+  // inserted .view node (fade-in), which keeps motion without hiding the DOM.
+  var app=$('#app');
+  app.classList.remove('fade-out');
+  app.innerHTML='<div class="view">'+html+'</div>';
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if(reduce) return;
+  var v=app.firstChild;
+  v.classList.add('fade-out');
+  void v.offsetWidth;   // force reflow so the transition actually runs
+  window.requestAnimationFrame(function(){ v.classList.remove('fade-out'); });
+}
+// tiny alias used by countdown
+function currentRoute_(){ return currentRoute(); }
+
+/* =========================================================================
+   BOOT
+   ========================================================================= */
+var BOOTED=false;
+function boot(){
+  if(BOOTED) return; BOOTED=true;
+  var ctx=weekContext(getNow());
+  var prior=new Date(ctx.weekStart); prior.setDate(prior.getDate()-7);
+  var keep=[ctx.weekStartISO, isoDay(prior)];
+  purgeOldChecks(keep);
+  // Delegated click listener attached exactly once on the persistent #app element.
+  var app=$('#app');
+  app.addEventListener('click', onAppClick);
+  window.addEventListener('hashchange', route);
+  route();
+}
+// expose a couple names the countdown closure references
+window.__preteRoute = currentRoute;
+document.addEventListener('DOMContentLoaded', boot);
+if(document.readyState!=='loading'){ boot(); }
+
+// Fix: countdown references currentRoute() — make sure it resolves
+})();
+</script>
+</body>
+</html>
