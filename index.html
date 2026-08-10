@@ -306,6 +306,41 @@ body[data-kid="felicity"] .txt{ font-size:1.09rem; }
 .btn-xl{ font-size:1.12rem; padding:18px 20px; border-radius:13px; font-weight:500; letter-spacing:.01em; }
 .checkoff-wrap{ margin:30px 0 8px; }
 .checkoff-note{ text-align:center; color:var(--muted); font-size:.82rem; margin:10px 2px 0; }
+.catchup-link{ font-family:var(--font-mono); font-size:.78rem; color:var(--muted); text-decoration:none; }
+.catchup-link:hover{ color:var(--ink); }
+
+/* ---- Full-screen effect canvas for the "Done" celebration ------------- */
+#fx{ position:fixed; inset:0; width:100%; height:100%; pointer-events:none; z-index:45; }
+
+/* ---- Rotating-duties reference (no names) ----------------------------- */
+.duty-links{ display:flex; gap:8px; margin:12px 0 4px; }
+.duty-links a{ flex:1; text-align:center; text-decoration:none; padding:12px 8px; min-height:44px;
+  display:flex; align-items:center; justify-content:center;
+  border:1px solid var(--rule); border-radius:10px;
+  font-family:var(--font-mono); font-size:.74rem; letter-spacing:.05em; text-transform:uppercase; color:var(--ink); }
+.duty-links a:hover{ border-color:var(--ink); }
+.seg-switch{ display:flex; gap:8px; margin:16px 0 8px; }
+.seg{ flex:1; text-align:center; text-decoration:none; padding:11px 8px; min-height:44px;
+  display:flex; align-items:center; justify-content:center;
+  border:1px solid var(--rule); border-radius:10px;
+  font-family:var(--font-mono); font-size:.76rem; letter-spacing:.05em; text-transform:uppercase; color:var(--muted); }
+.seg:hover{ border-color:var(--ink); color:var(--ink); }
+.seg.on{ background:var(--ink); color:#fff; border-color:var(--ink); }
+.seg.on:hover{ color:#fff; }
+.ref-list{ list-style:none; margin:0 0 6px; padding:0; }
+.ref-list li{ position:relative; padding:10px 0 10px 20px; border-top:1px solid var(--rule); }
+.ref-list li:first-child{ border-top:0; }
+.ref-list li::before{ content:"–"; position:absolute; left:2px; color:var(--muted); }
+
+/* ---- Last-week catch-up banner ---------------------------------------- */
+.lastweek-banner{ display:flex; align-items:center; justify-content:space-between; gap:12px;
+  border:1px solid var(--rule); border-left:3px solid var(--accent); border-radius:10px;
+  padding:12px 14px; margin:4px 0 16px; background:#fff; }
+.lw-txt{ font-size:.9rem; }
+.lw-tag{ font-family:var(--font-mono); font-size:.64rem; letter-spacing:.1em; text-transform:uppercase;
+  color:#fff; background:var(--accent); border-radius:999px; padding:3px 8px; margin-right:8px; }
+.lw-back{ font-family:var(--font-mono); font-size:.76rem; color:var(--accent); text-decoration:none; white-space:nowrap; }
+.lw-back:hover{ text-decoration:underline; }
 
 /* ---- Done / N/A mark control (both give full credit) ------------------- */
 li.item{ align-items:center; }
@@ -722,6 +757,87 @@ function toast(msg){
   clearTimeout(toastT); toastT=setTimeout(function(){ t.classList.remove('show'); }, 2600);
 }
 
+/* ---------- FX: a fun, randomized burst when a "Done" button is tapped --
+   Pure canvas, no libraries. Picks a random variant each time (radial burst,
+   confetti, sparkles, fountain, or expanding rings), tinted with the kid's
+   accent. Fully skipped when the user prefers reduced motion. */
+var FX = (function(){
+  var canvas=null, cx=null, dpr=1, W=0, H=0, parts=[], rings=[], raf=null;
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function rnd(a,b){ return a + Math.random()*(b-a); }
+  function pick(a){ return a[(Math.random()*a.length)|0]; }
+  function ensure(){
+    if(canvas) return;
+    canvas=document.createElement('canvas'); canvas.id='fx'; canvas.setAttribute('aria-hidden','true');
+    document.body.appendChild(canvas); cx=canvas.getContext('2d');
+    resize(); window.addEventListener('resize', resize);
+  }
+  function resize(){
+    if(!canvas) return;
+    dpr=Math.min(window.devicePixelRatio||1, 2);
+    W=window.innerWidth; H=window.innerHeight;
+    canvas.width=W*dpr; canvas.height=H*dpr;
+    canvas.style.width=W+'px'; canvas.style.height=H+'px';
+    cx.setTransform(dpr,0,0,dpr,0,0);
+  }
+  function star(x,y,r,rot){
+    cx.beginPath();
+    for(var i=0;i<5;i++){
+      var a=rot + i*2*Math.PI/5 - Math.PI/2;
+      var xa=x+Math.cos(a)*r, ya=y+Math.sin(a)*r;
+      var b=a+Math.PI/5, xb=x+Math.cos(b)*r*0.45, yb=y+Math.sin(b)*r*0.45;
+      if(i===0) cx.moveTo(xa,ya); else cx.lineTo(xa,ya);
+      cx.lineTo(xb,yb);
+    }
+    cx.closePath(); cx.fill();
+  }
+  function burst(x, y, accent){
+    if(reduce) return;                    // respect prefers-reduced-motion
+    ensure();
+    accent = accent || '#33556E';
+    var pal = [accent, '#E7B84E', '#F4EAD5', pick(['#33556E','#74374F','#A4712A'])];
+    var v = pick(['radial','confetti','sparkle','fountain','rings']);
+    if(v==='rings'){
+      rings.push({x:x,y:y,r:6,vr:rnd(2.2,3.4),a:1,w:rnd(2,3.5),c:accent});
+      if(Math.random()<0.7) rings.push({x:x,y:y,r:2,vr:rnd(1.5,2.4),a:0.9,w:2,c:'#F4EAD5'});
+    } else {
+      var n = v==='confetti'?(rnd(28,42)|0) : v==='sparkle'?(rnd(14,22)|0) : (rnd(24,38)|0);
+      for(var i=0;i<n;i++){
+        var p={ x:x, y:y, life:0, c:pick(pal), rot:rnd(0,6.283), vr:rnd(-0.35,0.35), g:0.2, ttl:rnd(45,80), shape:'circle', size:rnd(2.5,5), w:5, h:8, tw:false };
+        if(v==='radial'){ var a=rnd(0,6.283), s=rnd(2.5,7.5); p.vx=Math.cos(a)*s; p.vy=Math.sin(a)*s; p.g=0.12; p.shape=pick(['circle','circle','rect']); p.w=rnd(3,6); p.h=rnd(3,6); }
+        else if(v==='confetti'){ p.vx=rnd(-3.6,3.6); p.vy=rnd(-9,-4); p.g=0.28; p.shape='rect'; p.w=rnd(4,8); p.h=rnd(6,11); p.ttl=rnd(60,95); }
+        else if(v==='sparkle'){ var a2=rnd(0,6.283), s2=rnd(1,4); p.vx=Math.cos(a2)*s2; p.vy=Math.sin(a2)*s2-rnd(0.5,2); p.g=0.05; p.shape='star'; p.size=rnd(3,6); p.ttl=rnd(35,62); p.tw=true; }
+        else { p.vx=rnd(-2.4,2.4); p.vy=rnd(-11,-6.5); p.g=0.34; p.shape=pick(['circle','rect']); p.w=rnd(3,6); p.h=rnd(3,8); }
+        parts.push(p);
+      }
+    }
+    if(!raf) raf=requestAnimationFrame(loop);
+  }
+  function loop(){
+    cx.clearRect(0,0,W,H);
+    var r;
+    for(r=rings.length-1;r>=0;r--){
+      var ri=rings[r]; ri.r+=ri.vr; ri.a-=0.02;
+      if(ri.a<=0){ rings.splice(r,1); continue; }
+      cx.globalAlpha=Math.max(ri.a,0); cx.strokeStyle=ri.c; cx.lineWidth=ri.w;
+      cx.beginPath(); cx.arc(ri.x,ri.y,ri.r,0,6.283); cx.stroke();
+    }
+    for(var i=parts.length-1;i>=0;i--){
+      var p=parts[i]; p.life++; p.vy+=p.g; p.x+=p.vx; p.y+=p.vy; p.rot+=p.vr;
+      var t=p.life/p.ttl; if(t>=1){ parts.splice(i,1); continue; }
+      var al=1-t; if(p.tw) al*=(0.45+0.55*Math.abs(Math.sin(p.life*0.5)));
+      cx.globalAlpha=Math.max(al,0); cx.fillStyle=p.c;
+      if(p.shape==='circle'){ cx.beginPath(); cx.arc(p.x,p.y,p.size,0,6.283); cx.fill(); }
+      else if(p.shape==='star'){ star(p.x,p.y,p.size+2,p.rot); }
+      else { cx.save(); cx.translate(p.x,p.y); cx.rotate(p.rot); cx.fillRect(-p.w/2,-p.h/2,p.w,p.h); cx.restore(); }
+    }
+    cx.globalAlpha=1;
+    if(parts.length || rings.length){ raf=requestAnimationFrame(loop); }
+    else { raf=null; cx.clearRect(0,0,W,H); }
+  }
+  return { burst:burst };
+})();
+
 /* ---------- rendering: shared bits -------------------------------------- */
 var CTX = weekContext(getNow());   // recomputed on each full render
 var VIEW = { kid:null, ctx:null, cw:null, weekISO:null };  // active kid context
@@ -828,6 +944,12 @@ function renderHome(){
   // Rotation dial
   h+='<p class="home-label">Whose turn — this week &amp; next</p>';
   h+=dialHTML(cw);
+
+  // The rotating chores themselves, name-free (anyone can browse them)
+  h+='<div class="duty-links">'
+    +'<a href="#/duties/a">A Duties</a>'
+    +'<a href="#/duties/b">B Duties</a>'
+    +'<a href="#/duties/c">C Duties</a></div>';
 
   // Kid cards
   h+='<p class="home-label spaced">Everyone this week — tap a name</p>';
@@ -944,16 +1066,55 @@ function dialHTML(cw){
 }
 
 /* =========================================================================
-   KID VIEW
+   ROTATING DUTIES (name-free reference — anyone can browse A / B / C)
    ========================================================================= */
-function renderKid(kidId){
+function renderDuties(track){
+  document.body.removeAttribute('data-kid');
+  track=(track||'A').toUpperCase(); if(!FAMILY.duties[track]) track='A';
+  var d=FAMILY.duties[track];
+  var h=backLink();
+  h+='<h1 class="kid-name" style="font-size:2rem;margin-top:6px">Rotating duties</h1>';
+  h+='<hr class="rule-accent" style="--accent:var(--ink)">';
+  h+='<p class="muted">These three tracks rotate through the family every week. Here’s what each one covers — no names, just the work.</p>';
+
+  // A / B / C switcher
+  h+='<div class="seg-switch">';
+  ['A','B','C'].forEach(function(t){
+    h+='<a class="seg'+(t===track?' on':'')+'" href="#/duties/'+t.toLowerCase()+'"'+(t===track?' aria-current="page"':'')+'>'+t+' Duties</a>';
+  });
+  h+='</div>';
+
+  // Selected track, full content as a read-only reference
+  h+='<h2 class="section-title">'+esc(d.label)+' — '+esc(d.summary)+'</h2>';
+  d.groups.forEach(function(g){
+    h+='<div class="group-title">'+esc(g.title)+(g.type==='choose-one'?' <span class="hint">— choose one</span>':'')+'</div>';
+    h+='<ul class="ref-list">';
+    g.items.forEach(function(it){ h+='<li>'+esc(it)+'</li>'; });
+    h+='</ul>';
+  });
+  setView(h);
+}
+
+/* =========================================================================
+   KID VIEW  (opts.last = catch up on last week)
+   ========================================================================= */
+function renderKid(kidId, opts){
+  opts=opts||{};
   var kid=kidById(kidId); if(!kid){ location.hash='#/'; return; }
   document.body.setAttribute('data-kid', kid.id);
-  var ctx=CTX, now=ctx.now, cw=ctx.cycleWeek;
+  var now=CTX.now, last=!!opts.last;
+
+  // Target week: current, or the previous Monday-anchored week for catch-up.
+  var wkStart=new Date(CTX.weekStart); if(last) wkStart.setDate(wkStart.getDate()-7);
+  var wkISO=isoDay(wkStart);
+  var wkCw=cycleWeekFor(wkStart);
+  var sunday=new Date(wkStart); sunday.setDate(sunday.getDate()+6);
+  var wkCtx={ weekStartISO:wkISO, weekStart:wkStart, cycleWeek:wkCw, now:now, last:last };
+
   var age=ageOn(kid.birthdate, now);
   var allow=weeklyAllowance(age);
-  var cl=buildChecklist(kid, cw);
-  var checks=loadChecks(ctx.weekStartISO, kid.id);
+  var cl=buildChecklist(kid, wkCw);
+  var checks=loadChecks(wkISO, kid.id);
   var ep=earningPotential(kid, age);
   var nb=nextBirthday(kid.birthdate, now);
   var newAllow=weeklyAllowance(age+1);
@@ -962,27 +1123,37 @@ function renderKid(kidId){
   var h='';
   h+=backLink();
 
+  // Catch-up banner for last-week mode
+  if(last){
+    h+='<div class="lastweek-banner">'
+      +'<div class="lw-txt"><span class="lw-tag">Catching up</span>Last week · Week <span class="num">'+wkCw+'</span> · ended '+esc(longDate(sunday))+'</div>'
+      +'<a class="lw-back" href="#/'+kid.id+'">This week →</a>'
+      +'</div>';
+  }
+
   h+='<header class="kid-head"><span class="kid-letter">'+cl.letter+'</span>'
     +'<div><div class="kid-name">'+esc(kid.name)+'</div>'
     +'<div class="kid-sub">Age <span class="num">'+age+'</span> · '
-    +esc(FAMILY.duties[cl.letter].label)+' this week · '+esc(kid.accentName)+'</div>'
+    +esc(FAMILY.duties[cl.letter].label)+(last?' last week':' this week')+' · '+esc(kid.accentName)+'</div>'
     +(kid.withParent?'<div class="kid-sub" style="font-style:italic">'+esc('All duties are done with Mom or Dad.')+'</div>':'')
     +'</div></header>';
 
-  // Hero — illustrative yearly potential (the motivating number)
-  h+='<section class="hero"><p class="eyebrow">Illustrative — a full year of steady work</p>'
-    +'<div class="big num">'+money(ep.total)+'</div>'
-    +'<div class="cap">Allowance, monthly chores, extra jobs, and '+(C.savingsInterestRate*100)+'% interest combined. A picture of what’s possible, not a promise.</div></section>';
+  // Hero — current week only
+  if(!last){
+    h+='<section class="hero"><p class="eyebrow">Illustrative — a full year of steady work</p>'
+      +'<div class="big num">'+money(ep.total)+'</div>'
+      +'<div class="cap">Allowance, monthly chores, extra jobs, and '+(C.savingsInterestRate*100)+'% interest combined. A picture of what’s possible, not a promise.</div></section>';
+  }
 
   // Persistent tracker note
   h+='<p class="tracker-note">This is your own tracker. Official check-off is still in person or by text — with Mom or Dad.</p>';
 
   // Progress
-  var pr=progressFor(kid, cw, checks);
+  var pr=progressFor(kid, wkCw, checks);
   h+='<div class="progress" id="prog-wrap"><span id="prog-text">'
     +'<span class="done"><span class="num">'+pr.done+'</span></span> of <span class="num">'+pr.total+'</span> checked</span>'
     +'<div class="progress-bar"><span id="prog-bar" style="width:'+(pr.total?Math.round(pr.done/pr.total*100):0)+'%"></span></div>'
-    +'<div class="all-done" id="all-done" '+((pr.total>0&&pr.done===pr.total)?'':'style="display:none"')+'>You’re done for the week.</div>'
+    +'<div class="all-done" id="all-done" '+((pr.total>0&&pr.done===pr.total)?'':'style="display:none"')+'>'+(last?'Last week is all checked off.':'You’re done for the week.')+'</div>'
     +'</div>';
 
   // How to mark items
@@ -1010,34 +1181,38 @@ function renderKid(kidId){
   cl.baseItems.forEach(function(it){ h+=itemHTML(kid, it, checks); });
   h+='</ul>';
 
-  // Facts
-  h+='<div class="factrow">';
-  h+='<div class="fact"><span class="k">Dinner night</span><span class="v">'+esc(kid.dinnerNight)+'</span></div>';
-  if(bath) h+='<div class="fact"><span class="k">Bathroom</span><span class="v">'+esc(bath)+'</span></div>';
-  h+='<div class="fact"><span class="k">Weekly allowance</span><span class="v num">'+money(allow)+'</span></div>';
-  h+='<div class="fact"><span class="k">Goes up on '+esc(birthdayLabel(nb))+'</span><span class="v num">'+money(newAllow)+'/wk</span></div>';
-  h+='</div>';
+  // Current-week extras: facts + extra jobs (hidden while catching up)
+  if(!last){
+    h+='<div class="factrow">';
+    h+='<div class="fact"><span class="k">Dinner night</span><span class="v">'+esc(kid.dinnerNight)+'</span></div>';
+    if(bath) h+='<div class="fact"><span class="k">Bathroom</span><span class="v">'+esc(bath)+'</span></div>';
+    h+='<div class="fact"><span class="k">Weekly allowance</span><span class="v num">'+money(allow)+'</span></div>';
+    h+='<div class="fact"><span class="k">Goes up on '+esc(birthdayLabel(nb))+'</span><span class="v num">'+money(newAllow)+'/wk</span></div>';
+    h+='</div>';
 
-  // Additional-chore opportunities for this kid
-  var opts=FAMILY.additional.filter(function(a){ return a.who.indexOf(kid.id)!==-1; });
-  h+='<h2 class="section-title">Extra jobs, for extra pay</h2>';
-  if(opts.length){
-    h+='<ul class="optlist">';
-    opts.forEach(function(o){ h+='<li>'+esc(o.text)+'</li>'; });
-    h+='</ul>';
-  } else {
-    h+='<p class="muted">Ask Mom or Dad about extra jobs you can take on.</p>';
+    var aopts=FAMILY.additional.filter(function(a){ return a.who.indexOf(kid.id)!==-1; });
+    h+='<h2 class="section-title">Extra jobs, for extra pay</h2>';
+    if(aopts.length){
+      h+='<ul class="optlist">';
+      aopts.forEach(function(o){ h+='<li>'+esc(o.text)+'</li>'; });
+      h+='</ul>';
+    } else {
+      h+='<p class="muted">Ask Mom or Dad about extra jobs you can take on.</p>';
+    }
   }
 
   // Big check-off action at the very bottom of the list
   h+='<div class="checkoff-wrap">'
-    +'<button class="btn btn-primary btn-block btn-xl" id="check-off" type="button">Check Off with Mom / Dad</button>'
-    +'<p class="checkoff-note">Sends Mom or Dad this week’s progress so they can check you off.</p>'
-    +'<div class="mini" style="justify-content:center"><button id="reset-week" type="button">Reset my week</button></div>'
+    +'<button class="btn btn-primary btn-block btn-xl" id="check-off" type="button">'+(last?'Check Off Last Week with Mom / Dad':'Check Off with Mom / Dad')+'</button>'
+    +'<p class="checkoff-note">'+(last?'Sends Mom or Dad last week’s progress.':'Sends Mom or Dad this week’s progress so they can check you off.')+'</p>'
+    +'<div class="mini" style="justify-content:center;gap:22px">'
+    +'<button id="reset-week" type="button">Reset '+(last?'last week':'my week')+'</button>'
+    +(last?'':'<a class="catchup-link" href="#/'+kid.id+'/last">Catch up on last week</a>')
+    +'</div>'
     +'</div>';
 
   setView(h);
-  wireKid(kid, ctx, cw);
+  wireKid(kid, wkCtx, wkCw);
 }
 
 // A regular checklist item: text + a Done / N/A control (either = full credit).
@@ -1094,6 +1269,11 @@ function onAppClick(e){
     });
     li.classList.toggle('marked', checks[id]==='done'||checks[id]==='na');
     updateProgress(kid, cw, checks);
+    // Fun burst only when an item is newly marked Done (not N/A, not un-toggled)
+    if(val==='done' && checks[id]==='done'){
+      var rc=mk.getBoundingClientRect();
+      FX.burst(rc.left+rc.width/2, rc.top+rc.height/2, kid.accent);
+    }
     return;
   }
 
@@ -1109,6 +1289,11 @@ function onAppClick(e){
     if(!wasSel){ checks2[oid]='done'; opt.setAttribute('aria-pressed','true'); }
     saveChecks(weekISO, kid.id, checks2);
     updateProgress(kid, cw, checks2);
+    // Burst when a choose-one job is newly picked
+    if(!wasSel){
+      var rc2=opt.getBoundingClientRect();
+      FX.burst(rc2.left+Math.min(rc2.width*0.18,60), rc2.top+rc2.height/2, kid.accent);
+    }
     return;
   }
 }
@@ -1131,7 +1316,7 @@ function buildMessage(kid, ctx, cw){
   var baseDone=(pr.bDone===pr.bTotal);
   var allDone=(pr.total>0 && pr.done===pr.total);
   var lines=[];
-  lines.push(kid.name+' — Week '+cw+(allDone?' chores done':' chores update'));
+  lines.push(kid.name+' — Week '+cw+(ctx.last?' (last week)':'')+(allDone?' chores done':' chores update'));
   lines.push(shortStamp(getNow()));
   lines.push(FAMILY.duties[pr.letter].label+': '+pr.dDone+' of '+pr.dTotal+(dutyDone?' ✓':''));
   lines.push('Baseline: '+pr.bDone+' of '+pr.bTotal+(baseDone?' ✓':''));
@@ -1151,10 +1336,10 @@ function checkOff(kid, ctx, cw){
   location.href=url;
 }
 function resetWeek(kid, weekISO, cw){
-  if(!window.confirm('Reset this week for '+kid.name+'? This clears the check-offs on this device only.')) return;
+  if(!window.confirm('Reset for '+kid.name+'? This clears the check-offs for this week on this device only.')) return;
   try{ localStorage.removeItem(checksKey(weekISO, kid.id)); }catch(e){}
-  renderKid(kid.id);
-  toast('Your week has been reset.');
+  route();   // re-render the current view (this week or last week)
+  toast('Checklist reset.');
 }
 
 /* =========================================================================
@@ -1368,7 +1553,10 @@ function currentRoute(){
   var hash=(location.hash||'').replace(/^#\/?/, '');
   if(hash==='' ) return 'home';
   if(hash==='money' || hash==='principles' || hash==='fineprint') return hash;
-  if(kidById(hash)) return 'kid:'+hash;
+  if(hash==='duties') return 'duties:A';
+  if(hash.indexOf('duties/')===0){ var t=hash.slice(7).toUpperCase(); return 'duties:'+(FAMILY.duties[t]?t:'A'); }
+  var parts=hash.split('/');
+  if(kidById(parts[0])) return 'kid:'+parts[0]+(parts[1]==='last'?':last':'');
   return 'home';
 }
 var lastRoute=null;
@@ -1379,7 +1567,8 @@ function route(){
   var r=currentRoute();
   lastRoute=r;
   if(r==='home'){ document.body.removeAttribute('data-kid'); renderHome(); }
-  else if(r.indexOf('kid:')===0){ renderKid(r.slice(4)); }
+  else if(r.indexOf('kid:')===0){ var kp=r.slice(4).split(':'); renderKid(kp[0], { last: kp[1]==='last' }); }
+  else if(r.indexOf('duties:')===0){ renderDuties(r.slice(7)); }
   else if(r==='money'){ renderMoney(); }
   else if(r==='principles'){ renderPrinciples(); }
   else if(r==='fineprint'){ renderFinePrint(); }
