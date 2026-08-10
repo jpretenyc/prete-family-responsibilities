@@ -127,6 +127,23 @@ page says: *"This is your own tracker. Official check-off is still in person or
 by text — with Mom or Dad."* Everything resets on its own when a new chore week
 begins.
 
+**A little celebration.** Tapping **Done** sets off a quick, randomized burst of
+color from the button (confetti, sparkles, rings — it varies each time). It's
+purely visual and is automatically skipped for anyone whose device is set to
+"reduce motion."
+
+**Catching up on last week.** Under each kid's Check-Off button is a small
+*"Catch up on last week"* link. It opens last week's list (the correct duty
+letter for that week) so a kid who didn't finish can still mark it and text a
+parent. Only the current and previous week are kept.
+
+## Browsing the rotating duties (no names)
+
+The home screen has three buttons — **A Duties / B Duties / C Duties** — under
+the rotation dial. Anyone can tap them to read exactly what each rotating track
+covers, without it being tied to a person. (Direct links: `…/#/duties/a`,
+`…/#/duties/b`, `…/#/duties/c`.)
+
 > **Privacy note:** the parent phone numbers live in **data.js**
 > (`config.parents`). If this site is published to a **public** URL, those
 > numbers become visible in the page's source to anyone with the link. If you
