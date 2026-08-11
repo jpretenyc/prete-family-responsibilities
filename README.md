@@ -38,6 +38,26 @@ Save the file, then refresh the website. That's it.
 **One rule:** keep the punctuation. If you delete a stray quote or comma the page
 can go blank. If that happens, undo your last change (Ctrl+Z) and save again.
 
+### Editing the LIVE app yourself, from any browser (no coder, no software)
+
+You can change the app the kids actually use without touching your computer's
+files or asking anyone. It all happens on the GitHub website:
+
+1. Go to **https://github.com/jpretenyc/prete-family-responsibilities**
+2. Click the **`data.js`** file, then the **pencil ✏️ icon** (top-right) to edit.
+3. Change the words inside the `"quotes"` — chores, names, dinner nights, the
+   `savingsInterestRate`, whatever you like. (Same punctuation rule as above.)
+4. Scroll down, click the green **Commit changes** button.
+5. Wait about a minute. The kids' app updates itself the next time they open it.
+
+That's the whole loop — edit, commit, done. Your local copy in OneDrive is just a
+backup now; the GitHub copy is what's live. (If you'd rather, you can still edit
+the local file and have it re-published, but the website way above is simplest.)
+
+> Tip: if you ever make a change that breaks the page, GitHub keeps every past
+> version. On the file, click **History**, open the last good version, and you can
+> restore it — nothing is ever truly lost.
+
 ---
 
 ## How to change the rotation anchor

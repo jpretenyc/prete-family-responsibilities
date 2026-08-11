@@ -184,6 +184,8 @@ h1,h2,h3{ font-family:var(--font-display); font-weight:500; line-height:1.12; ma
 .card-with{ display:block; margin-top:2px; font-size:.82rem; color:var(--muted); font-style:italic; }
 
 /* Quiet link row (Money / Principles / Fine print) */
+.monthly-note{ text-align:center; color:var(--muted); font-size:.9rem; margin:20px 6px 0; line-height:1.5; }
+.monthly-note a{ color:var(--ink); text-decoration:underline; text-underline-offset:2px; }
 .link-row{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-top:22px; }
 .link-row a{
   text-decoration:none; color:var(--ink); border:1px solid var(--rule); border-radius:10px;
@@ -994,6 +996,12 @@ function renderHome(){
   });
   h+='</section>';
 
+  // Monthly-chores reminder (family-wide; details on the Money page)
+  if(FAMILY.monthly){
+    h+='<p class="monthly-note">Once a month, <b>everyone</b> pitches in on '
+      +'<a href="#/money">monthly chores</a> — 90+ minutes on bigger projects.</p>';
+  }
+
   // Quiet link row
   h+='<nav class="link-row" aria-label="More">'
     +'<a href="#/money">Money</a>'
@@ -1381,6 +1389,20 @@ function renderMoney(){
   });
   h+='</tbody></table>';
   h+='<p class="muted" style="font-size:.86rem">Weekly allowance is age × '+C.allowanceMultiplier+'. Monthly chore pay is the same, at full completion.</p>';
+
+  // Monthly chores (family-wide; tied to allowance)
+  if(FAMILY.monthly){
+    var mo=FAMILY.monthly;
+    h+='<h2 class="section-title" style="--accent:var(--ink)" id="monthly">'+esc(mo.label)+'</h2>';
+    h+='<p>'+esc(mo.description)+'</p>';
+    h+='<p class="muted" style="font-size:.86rem">Monthly chores are their own pay (age × '+C.allowanceMultiplier+', at full completion) — and a week’s weekly allowance is forfeited if that month’s monthly chores aren’t done.</p>';
+    if(mo.examples && mo.examples.length){
+      h+='<p class="eyebrow" style="margin:12px 0 6px">'+esc(mo.examplesLabel||'Examples')+'</p>';
+      h+='<ul class="ref-list">';
+      mo.examples.forEach(function(x){ h+='<li>'+esc(x)+'</li>'; });
+      h+='</ul>';
+    }
+  }
 
   // Waterfall 10 / 40 / 50
   var sp=C.split;
