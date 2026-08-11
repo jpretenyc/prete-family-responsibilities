@@ -166,6 +166,63 @@ want a link the kids can open from anywhere:
 
 No changes to the files are needed either way.
 
+The site is currently published at:
+**https://jpretenyc.github.io/prete-family-responsibilities/**
+
+---
+
+## Installing it as a "Chores" app on iPhone
+
+The site is set up as an installable web app. There's no App Store download — you
+add it straight from Safari, and it behaves like a normal app (its own icon,
+full-screen, works offline).
+
+**On each kid's iPhone:**
+
+1. Open the published link in **Safari** (it must be Safari, not Chrome).
+2. Tap the **Share** button (the square with an up-arrow).
+3. Scroll down and tap **Add to Home Screen**.
+4. The name will already say **"Chores"** — tap **Add**.
+
+A "Chores" icon (the slate check mark) now sits on the home screen and opens
+full-screen with no browser bars. Because there's a service worker, it also keeps
+working if the connection drops.
+
+### Making it available during Downtime (Screen Time)
+
+This is the part to test on your own device before relying on it, because Apple's
+behavior here varies by iOS version:
+
+1. On the child's phone (or from your phone via Family Sharing): **Settings →
+   Screen Time → Always Allowed**.
+2. Tap **Add Apps** / the "+" list and look for **Chores**.
+3. If it appears, add it — it will then stay open during Downtime like any
+   allowed app.
+
+**If "Chores" does not appear in the Always Allowed list** (some iOS versions
+treat home-screen web apps as Safari content during Downtime), your options are:
+
+- Add **Safari** to Always Allowed — simplest, but it allows *all* web browsing
+  during Downtime, not just this app.
+- Or use a true native wrapper app (see below) if you want a guaranteed, app-only
+  whitelist entry.
+
+### If you want a real App Store–style app (guaranteed whitelistable)
+
+The only way to get an app that is *guaranteed* to show up individually in
+Always Allowed is a small native wrapper (a one-screen app that displays this
+website). That requires a **Mac with Xcode**, and to install it on the kids'
+phones you'd need either:
+
+- a **free** Apple ID — the app works but must be re-installed from the Mac every
+  7 days, or
+- the **Apple Developer Program ($99/year)** — install once for a year, or
+  distribute through TestFlight / the App Store.
+
+If you have a Mac and want to go this route, ask and a ready-to-build Xcode
+project can be generated for you. For most families the Add-to-Home-Screen app
+above is enough.
+
 ---
 
 ## Testing the deadline states (for a parent who's curious)
