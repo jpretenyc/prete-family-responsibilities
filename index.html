@@ -5,6 +5,16 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Prete Family Responsibilities</title>
 
+<!-- Installable "Chores" home-screen app (Add to Home Screen on iPhone) -->
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#16181D">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Chores">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" href="icon-192.png">
+
 <!-- Fonts load from Google Fonts but the site falls back to system fonts offline. -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -540,6 +550,15 @@ li.item{ align-items:center; }
 
 <!-- Content first, then the app. Both are plain <script> so file:// works. -->
 <script src="data.js"></script>
+<script>
+/* Register the service worker so the home-screen app works offline.
+   Only runs over http(s) — opening the file directly (file://) skips it. */
+if('serviceWorker' in navigator && location.protocol.indexOf('http') === 0){
+  window.addEventListener('load', function(){
+    navigator.serviceWorker.register('sw.js').catch(function(){});
+  });
+}
+</script>
 <script>
 "use strict";
 /* ==========================================================================
